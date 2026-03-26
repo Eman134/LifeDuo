@@ -1,50 +1,66 @@
-# Welcome to your Expo app 👋
+# 🐾 LifeDuo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+> **O app do casal: viva cada momento juntos.**
 
-## Get started
+LifeDuo é um app mobile para casais que combina gamificação emocional com utilidade real do dia a dia. Um mascote que evolui com o relacionamento, streak diário, metas compartilhadas, presentes digitais e muito mais — tudo num só lugar, só para vocês dois.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## O mascote
 
-2. Start the app
+O coração do app. Um bichinho virtual que reflete o relacionamento de vocês — evolui com XP, reage ao check-in diário, fica triste quando o app não é aberto e comemora cada conquista. Escolha entre 6 modelos geométricos: Bolinha, Cubinho, Ovinho, Tripé, Bolhas e Estrelinha. Vista com roupinhas, acessórios e skins sazonais. Troque quando quiser — o pet antigo fica preservado na Galeria de Memórias.
 
-   ```bash
-   npx expo start
-   ```
+## Conexão diária
 
-In the output, you'll find options to open the app in a
+Check-in de humor — cada um registra como está, o par vê em tempo real. Localização privada com notificação quando chega em casa. Streak de casal: os dois precisam fazer check-in para manter a sequência. Missões semanais sorteadas automaticamente. Mensagens agendadas para datas futuras.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Metas e notas
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+Criem metas juntos — viagem, apartamento, economias — com progresso visual e celebração ao completar. Lista de desejos onde o par vê o que você quer, mas não sabe se já foi comprado. Notas compartilhadas, privadas e de voz. Listas de tarefas, watchlists e receitas favoritas.
 
-## Get a fresh project
+## Lugares para conhecer
 
-When you're ready, run:
+Wishlist de lugares que vocês querem visitar. Match automático quando os dois adicionam o mesmo lugar. Mapa de memórias com todos os lugares que já foram juntos. Descoberta curada por localização e gostos. Desafios semanais de exploração com recompensa em XP.
 
-```bash
-npm run reset-project
-```
+## Jogos e dicas
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Quizzes de "quanto você me conhece?", verdade ou desafio e puzzles cooperativos — novo jogo toda semana. Feed de dicas diárias contextualizadas pelo tempo de relacionamento e padrão de humor do casal. Conteúdo acionável: cada dica termina com algo pequeno para fazer hoje.
 
-## Learn more
+## Datas especiais e presentes
 
-To learn more about developing your project with Expo, look at the following resources:
+Lembretes inteligentes para aniversário, primeiro beijo e datas personalizadas — com alertas que começam 30 dias antes. Gift Center integrado: compre gift cards digitais de Cacau Show, iFood e Spotify, ou envie experiências e mimos diretamente para o par com animação de surpresa. Dicas de presentes personalizadas pela lista de desejos e gostos do par.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Saúde e bem-estar
 
-## Join the community
+Acompanhamento do ciclo menstrual integrado ao app, com notificação sutil e consensual para o parceiro — transforma informação privada em empatia do casal. Perfil do pet real do casal com vacinas, consultas e aniversário.
 
-Join our community of developers creating universal apps.
+## Integrações
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Spotify para gerar a playlist do casal com os gostos em comum. Instagram e TikTok para inferir estética e interesses e personalizar recomendações. Google Calendar para sincronizar datas especiais.
+
+## Gamificação
+
+Sistema de XP com 7 níveis de evolução do pet. Conquistas colecionáveis por marcos do relacionamento. Streak com proteção via freeze. Pets desbloqueáveis por nível: Bolhas no nível 20, Tripé no 25, Estrelinha no 30.
+
+---
+
+## Planos
+
+| | Free | Premium |
+|---|---|---|
+| Preço | R$0 | R$24/mês por casal |
+| Pets | 1 básico | Até 3, todos os modelos |
+| Metas | 3 ativas | Ilimitadas |
+| Notas | 20 | Ilimitadas + voz |
+| Streaks | 1 freeze/mês | 3 freezes/mês |
+| Extras | — | Jogos, ciclo, conquistas, acesso antecipado sazonal |
+
+---
+
+## Stack
+
+React Native + Expo · Supabase · PostgreSQL · Stripe + Pagar.me
+
+---
+
+*LifeDuo — feito para casais que querem viver cada momento juntos.*
