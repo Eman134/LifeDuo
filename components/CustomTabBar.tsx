@@ -11,13 +11,13 @@ import Animated, {
 
 const { width } = Dimensions.get('window');
 
-import { useColorScheme } from 'react-native';
+import { useColorScheme } from 'nativewind';
 
 const ACTIVE_BG_COLOR = '#E26D92';
 const ACTIVE_TEXT_COLOR = '#FFFFFF';
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
-  const colorScheme = useColorScheme();
+  const { colorScheme } = useColorScheme();
   const isDark = colorScheme === 'dark';
 
   const tabBarColor = isDark ? '#1E1E1E' : '#FEF4F7';

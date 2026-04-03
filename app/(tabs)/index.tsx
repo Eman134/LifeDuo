@@ -1,26 +1,17 @@
-import React, { useRef } from 'react';
-import { ScrollView } from 'react-native';
-import { useFocusEffect } from 'expo-router';
 import { Box } from '@/components/ui/box';
-import { Text } from '@/components/ui/text';
-import { Heading } from '@/components/ui/heading';
 import { Button, ButtonText } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { HStack } from '@/components/ui/hstack';
-import { VStack } from '@/components/ui/vstack';
 import { Center } from '@/components/ui/center';
+import { Heading } from '@/components/ui/heading';
+import { HStack } from '@/components/ui/hstack';
+import { Text } from '@/components/ui/text';
+import { VStack } from '@/components/ui/vstack';
+import React from 'react';
+import { ScrollView } from 'react-native';
 
 export default function HomeScreen() {
-  const scrollRef = useRef<ScrollView>(null);
-
-  useFocusEffect(
-    React.useCallback(() => {
-      scrollRef.current?.scrollTo({ y: 0, animated: false });
-    }, [])
-  );
-
   return (
-    <ScrollView ref={scrollRef} className="flex-1 bg-background-0" contentContainerStyle={{ flexGrow: 1 }}>
+    <ScrollView className="flex-1 bg-background-0" contentContainerStyle={{ flexGrow: 1 }}>
       <Box className="flex-1 px-4 py-8">
         <Center className="mb-8 mt-12">
           <Heading size="3xl" className="text-primary-500 mb-2">

@@ -1,15 +1,35 @@
 import { Heading } from '@/components/ui/heading';
 import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
 import { VStack } from '@/components/ui/vstack';
+import { Text } from '@/components/ui/text';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import React from 'react';
-import { Image, ScrollView, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { useColorScheme as useNativeWindColorScheme } from 'nativewind';
+import React, { useState } from 'react';
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
+
+import { SettingsItem } from '@/components/more/SettingsItem';
+import { ThemeSelectionModal } from '@/components/more/ThemeSelectionModal';
 
 export default function ProfileScreen() {
-  const isDark = useColorScheme() === 'dark';
+  const { setColorScheme } = useNativeWindColorScheme();
+  const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system');
+  const [isThemeModalVisible, setThemeModalVisible] = useState(false);
+  const { colorScheme } = useNativeWindColorScheme();
+  const isDark = colorScheme === 'dark';
   const cardBg = isDark ? 'bg-[#1E1E1E]' : 'bg-background-0';
   const borderColor = isDark ? 'border-[#333333]' : 'border-outline-200';
+
+  const selectTheme = (mode: 'light' | 'dark' | 'system') => {
+    setThemeMode(mode);
+    setColorScheme(mode);
+    setThemeModalVisible(false);
+  };
+
+  const getThemeLabel = () => {
+    if (themeMode === 'light') return 'Claro';
+    if (themeMode === 'dark') return 'Escuro';
+    return 'Dispositivo';
+  };
 
   return (
     <ScrollView className="flex-1 bg-background-50 px-4 py-6" contentContainerStyle={{ paddingBottom: 100 }}>
@@ -42,7 +62,12 @@ export default function ProfileScreen() {
           <View className={`rounded-2xl ${cardBg} border ${borderColor} overflow-hidden`}>
             <SettingsItem icon="bell-ring" label="Notificações" />
             <View className={`h-[1px] ${isDark ? 'bg-[#333]' : 'bg-outline-200'} ml-12`} />
-            <SettingsItem icon="theme-light-dark" label="Aparência" />
+            <SettingsItem 
+              icon="theme-light-dark" 
+              label="Aparência" 
+              rightText={getThemeLabel()} 
+              onPress={() => setThemeModalVisible(true)} 
+            />
             <View className={`h-[1px] ${isDark ? 'bg-[#333]' : 'bg-outline-200'} ml-12`} />
             <SettingsItem icon="translate" label="Idioma" />
           </View>
@@ -60,20 +85,14 @@ export default function ProfileScreen() {
           </View>
         </View>
       </VStack>
-    </ScrollView>
-  );
-}
 
-function SettingsItem({ icon, label }: { icon: any; label: string }) {
-  const isDark = useColorScheme() === 'dark';
-  const iconColor = isDark ? '#A08B93' : '#CB7392';
-  return (
-    <TouchableOpacity className="flex-row items-center justify-between p-4">
-      <HStack space="md" className="items-center">
-        <MaterialCommunityIcons name={icon} size={24} color={iconColor} />
-        <Text className="text-typography-800 text-base font-medium">{label}</Text>
-      </HStack>
-      <MaterialCommunityIcons name="chevron-right" size={24} color="#9ca3af" />
-    </TouchableOpacity>
+      <ThemeSelectionModal 
+        visible={isThemeModalVisible}
+        onClose={() => setThemeModalVisible(false)}
+        themeMode={themeMode}
+        onSelectTheme={selectTheme}
+      />
+
+    </ScrollView>
   );
 }

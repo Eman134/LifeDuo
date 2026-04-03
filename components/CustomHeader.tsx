@@ -1,11 +1,13 @@
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import React from 'react';
-import { Image, Text, TouchableOpacity, useColorScheme, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useColorScheme } from 'nativewind';
 
 export function CustomHeader() {
   const insets = useSafeAreaInsets();
-  const isDark = useColorScheme() === 'dark';
+  const { colorScheme } = useColorScheme();
+  const isDark = colorScheme === 'dark';
 
   const startDate = new Date('2025-05-17T00:00:00');
   const today = new Date();
