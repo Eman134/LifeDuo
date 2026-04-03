@@ -1,98 +1,64 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/hello-wave';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { Link } from 'expo-router';
+import React, { useRef } from 'react';
+import { ScrollView } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { Box } from '@/components/ui/box';
+import { Text } from '@/components/ui/text';
+import { Heading } from '@/components/ui/heading';
+import { Button, ButtonText } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { HStack } from '@/components/ui/hstack';
+import { VStack } from '@/components/ui/vstack';
+import { Center } from '@/components/ui/center';
 
 export default function HomeScreen() {
-  return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <Link href="/modal">
-          <Link.Trigger>
-            <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-          </Link.Trigger>
-          <Link.Preview />
-          <Link.Menu>
-            <Link.MenuAction title="Action" icon="cube" onPress={() => alert('Action pressed')} />
-            <Link.MenuAction
-              title="Share"
-              icon="square.and.arrow.up"
-              onPress={() => alert('Share pressed')}
-            />
-            <Link.Menu title="More" icon="ellipsis">
-              <Link.MenuAction
-                title="Delete"
-                icon="trash"
-                destructive
-                onPress={() => alert('Delete pressed')}
-              />
-            </Link.Menu>
-          </Link.Menu>
-        </Link>
+  const scrollRef = useRef<ScrollView>(null);
 
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+  useFocusEffect(
+    React.useCallback(() => {
+      scrollRef.current?.scrollTo({ y: 0, animated: false });
+    }, [])
+  );
+
+  return (
+    <ScrollView ref={scrollRef} className="flex-1 bg-background-0" contentContainerStyle={{ flexGrow: 1 }}>
+      <Box className="flex-1 px-4 py-8">
+        <Center className="mb-8 mt-12">
+          <Heading size="3xl" className="text-primary-500 mb-2">
+            LifeDuo
+          </Heading>
+          <Text className="text-typography-500 text-center text-lg">
+            Gluestack-UI v3 & NativeWind v4 beautifully integrated!
+          </Text>
+        </Center>
+
+        <VStack space="xl" className="flex-1">
+          <Card className="p-5 border border-outline-200 rounded-xl bg-background-50 shadow-sm">
+            <Heading size="md" className="mb-2">
+              Getting Started
+            </Heading>
+            <Text className="text-typography-600 mb-4">
+              Edit the <Text className="font-bold">app/(tabs)/index.tsx</Text> file to see the changes update in real time.
+            </Text>
+            <HStack space="md" className="items-center">
+              <Button size="md" action="primary" variant="solid" className="flex-1 rounded-full">
+                <ButtonText>Explore Features</ButtonText>
+              </Button>
+              <Button size="md" action="secondary" variant="outline" className="flex-1 rounded-full">
+                <ButtonText>Documentation</ButtonText>
+              </Button>
+            </HStack>
+          </Card>
+
+          <Card className="p-5 border border-outline-200 rounded-xl bg-background-50 shadow-sm">
+            <VStack space="sm">
+              <Heading size="md">Modern Ecosystem</Heading>
+              <Text className="text-typography-600">
+                You are utilizing Expo v52+, React Native v0.76+, Gluestack UI v3, and NativeWind v4 out of the box. Building beautiful apps has never been easier.
+              </Text>
+            </VStack>
+          </Card>
+        </VStack>
+      </Box>
+    </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-  },
-});
