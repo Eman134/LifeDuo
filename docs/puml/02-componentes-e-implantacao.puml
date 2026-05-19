@@ -1,0 +1,74 @@
+@startuml
+title LifeDuo - Componentes (interfaces fornecidas/requeridas)
+skinparam componentStyle uml2
+left to right direction
+
+component "Mobile App\n(Expo/React Native)" as Mobile
+component "API Gateway\n(NestJS)" as Gateway
+component "Auth Module" as Auth
+component "Checkin Module" as Checkin
+component "Goal Module" as Goal
+component "Gift Module" as Gift
+component "Gamification Module" as Game
+component "Notification Facade" as Notif
+component "BullMQ Worker" as Worker
+
+interface "IAuthAPI" as IAuth
+interface "ICheckinAPI" as ICheckin
+interface "IGoalAPI" as IGoal
+interface "IGiftAPI" as IGift
+interface "IGamificationAPI" as IGame
+interface "IPushProvider" as IPush
+
+Gateway - IAuth
+Gateway - ICheckin
+Gateway - IGoal
+Gateway - IGift
+Gateway - IGame
+Notif - IPush
+
+Mobile ..> IAuth : requer
+Mobile ..> ICheckin : requer
+Mobile ..> IGoal : requer
+Mobile ..> IGift : requer
+Mobile ..> IGame : requer
+
+IAuth ..> Auth
+ICheckin ..> Checkin
+IGoal ..> Goal
+IGift ..> Gift
+IGame ..> Game
+
+Gift --> Notif : <<Facade>>
+Checkin --> Game : evento dominio\n<<Observer>>
+Worker ..> IPush : requer
+
+newpage
+title LifeDuo - Implantacao (junto ao diagrama de componentes)
+
+node "Dispositivo iOS/Android" as Device {
+  artifact "App LifeDuo"
+}
+
+node "Railway/Cloud" as Cloud {
+  node "Container API" as ApiNode {
+    artifact "NestJS API"
+  }
+  node "Container Worker" as WorkerNode {
+    artifact "BullMQ Worker"
+  }
+}
+
+database "PostgreSQL 16" as DB
+node "Redis 7" as Redis
+cloud "Firebase Cloud Messaging" as FCM
+cloud "Gateway de Pagamento" as Pay
+
+Device --> ApiNode : HTTPS/REST + JWT
+Device --> ApiNode : WebSocket
+ApiNode --> DB : Prisma
+ApiNode --> Redis : cache/streak
+WorkerNode --> Redis : filas
+WorkerNode --> FCM : push
+ApiNode --> Pay : API pagamento
+@enduml

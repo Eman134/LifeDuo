@@ -1,0 +1,47 @@
+@startuml
+title LifeDuo - Arquitetura (visao geral)
+skinparam packageStyle rectangle
+left to right direction
+
+package "Mobile (React Native + Expo)" {
+  [UI Features]
+  [Zustand Store]
+  [React Navigation]
+}
+
+package "Backend (NestJS - Monolito Modular)" {
+  [Auth Module]
+  [Couple Module]
+  [Checkin Module]
+  [Goal Module]
+  [Gift Module]
+  [Gamification Module]
+  [Wellness Module]
+  [WebSocket Gateway]
+  [BullMQ Workers]
+}
+
+database "PostgreSQL" as DB
+collections "Redis Cache" as Redis
+cloud "FCM" as FCM
+cloud "Payment Providers" as Pay
+cloud "Maps API" as Maps
+
+[UI Features] --> [Auth Module]
+[UI Features] --> [Checkin Module]
+[UI Features] --> [Goal Module]
+[UI Features] --> [Gift Module]
+[UI Features] --> [WebSocket Gateway]
+
+[Auth Module] --> DB
+[Checkin Module] --> DB
+[Goal Module] --> DB
+[Gift Module] --> DB
+[Gamification Module] --> DB
+[BullMQ Workers] --> Redis
+[Checkin Module] --> Redis
+[Gift Module] --> Pay
+[BullMQ Workers] --> FCM
+[UI Features] --> Maps
+@enduml
+

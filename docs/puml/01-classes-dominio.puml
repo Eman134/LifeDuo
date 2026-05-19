@@ -1,0 +1,72 @@
+@startuml
+title LifeDuo - Diagrama de Classes (dominio simplificado)
+skinparam classAttributeIconSize 0
+
+class Couple {
+  +id: UUID
+  +streakAtual: int
+  +registrarCheckin(humor)
+}
+
+class User {
+  +id: UUID
+  +nome: string
+  +email: string
+}
+
+class Pet {
+  +id: UUID
+  +xp: int
+  +estado: PetState
+  +ganharXp(pontos)
+}
+
+interface PetState {
+  +onCheckin()
+  +onInatividade()
+}
+
+class FelizState
+class TristeState
+
+interface DomainEvent
+class CheckinRegistradoEvent
+class MissionCreatedEvent
+class EventBus {
+  +publish(event)
+  +subscribe(observer)
+}
+interface Observer {
+  +update(event)
+}
+class GamificationObserver
+
+interface MissionFactory {
+  +create(type): Mission
+}
+class WeeklyMissionFactory
+class Mission
+
+interface CoupleRepository {
+  +save(couple)
+  +findById(id)
+}
+class PrismaCoupleRepository
+
+User "2" -- "1" Couple : compoe
+Couple "1" o-- "1" Pet
+Pet --> PetState : <<State>>
+PetState <|.. FelizState
+PetState <|.. TristeState
+
+DomainEvent <|.. CheckinRegistradoEvent
+DomainEvent <|.. MissionCreatedEvent
+Observer <|.. GamificationObserver
+EventBus --> Observer : <<Observer>>
+
+MissionFactory <|.. WeeklyMissionFactory
+WeeklyMissionFactory --> Mission : <<Factory Method>>
+
+CoupleRepository <|.. PrismaCoupleRepository : <<Repository>>
+@enduml
+

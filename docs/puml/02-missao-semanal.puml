@@ -1,0 +1,28 @@
+@startuml
+title UC-07 - Sequencia Gerar Missao Semanal
+autonumber
+
+actor "Scheduler" as Cron
+participant "MissionJob (BullMQ)" as Job
+participant "MissionFactory" as Factory
+participant "MissionService" as Service
+database "PostgreSQL" as DB
+participant "NotificationService" as Notification
+participant "FCM" as FCM
+
+Cron -> Job: disparar fila semanal
+Job -> Factory: criarMissao(tipo)\n<<Factory>>
+Factory --> Job: Missao
+Job -> Service: atribuirMissaoAoCasal(missao)
+Service -> DB: salvar missao
+Service -> Notification: notificarNovaMissao()
+Notification -> FCM: push "Nova missao da semana"
+FCM --> Notification: confirmado
+
+note right of Factory
+Contrato de Operacao (CO-02)
+Pre: agenda semanal ativa.
+Pos: missao criada e atribuida ao casal.
+end note
+@enduml
+

@@ -1,0 +1,16 @@
+@startuml
+title LifeDuo - Diagrama de Estados do Mascote
+
+[*] --> Neutro
+Neutro --> Feliz : check-in dos dois parceiros
+Feliz --> Empolgado : meta concluida / presente recebido
+Empolgado --> Feliz : tempo decorrido
+Feliz --> Triste : inatividade > 48h
+Triste --> Neutro : novo check-in
+Triste --> Congelado : uso de streak freeze
+Congelado --> Neutro : fim do freeze
+
+state Triste : reduz XP diario
+state Empolgado : bonus de XP
+@enduml
+
