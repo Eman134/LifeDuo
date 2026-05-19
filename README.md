@@ -34,26 +34,9 @@ Lembretes inteligentes para aniversário, primeiro beijo e datas personalizadas 
 
 Acompanhamento do ciclo menstrual integrado ao app, com notificação sutil e consensual para o parceiro — transforma informação privada em empatia do casal. Perfil do pet real do casal com vacinas, consultas e aniversário.
 
-## Integrações
-
-Spotify para gerar a playlist do casal com os gostos em comum. Instagram e TikTok para inferir estética e interesses e personalizar recomendações. Google Calendar para sincronizar datas especiais.
-
 ## Gamificação
 
 Sistema de XP com 7 níveis de evolução do pet. Conquistas colecionáveis por marcos do relacionamento. Streak com proteção via freeze. Pets desbloqueáveis por nível: Bolhas no nível 20, Tripé no 25, Estrelinha no 30.
-
----
-
-## Planos
-
-| | Free | Premium |
-|---|---|---|
-| Preço | R$0 | R$24/mês por casal |
-| Pets | 1 básico | Até 3, todos os modelos |
-| Metas | 3 ativas | Ilimitadas |
-| Notas | 20 | Ilimitadas + voz |
-| Streaks | 1 freeze/mês | 3 freezes/mês |
-| Extras | — | Jogos, ciclo, conquistas, acesso antecipado sazonal |
 
 ---
 
