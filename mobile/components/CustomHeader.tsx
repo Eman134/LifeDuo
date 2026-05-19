@@ -1,8 +1,8 @@
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
+import { useColorScheme } from 'nativewind';
 import React from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useColorScheme } from 'nativewind';
 
 export function CustomHeader() {
   const insets = useSafeAreaInsets();
@@ -75,11 +75,11 @@ export function CustomHeader() {
           }}
         >
           <FontAwesome5 name="fire" size={12} color="#FF9500" />
-          <Text style={{ fontSize: 12, fontWeight: 'bold', color: textColor, marginLeft: 4 }}>12</Text>
+          <Text style={{ fontSize: 12, fontWeight: 'bold', color: textColor, marginLeft: 4 }}>0</Text>
         </TouchableOpacity>
 
         {/* Credits */}
-        <TouchableOpacity
+        {/* <TouchableOpacity
           style={{
             flexDirection: 'row',
             alignItems: 'center',
@@ -91,13 +91,13 @@ export function CustomHeader() {
         >
           <MaterialCommunityIcons name="star-four-points" size={14} color="#FFD700" />
           <Text style={{ fontSize: 12, fontWeight: 'bold', color: textColor, marginLeft: 4 }}>450</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         {/* Notifications */}
         <TouchableOpacity style={{ padding: 4 }}>
           <MaterialCommunityIcons name="bell-outline" size={24} color={textColor} />
           {/* Unread notifications dot */}
-          <View style={{ position: 'absolute', top: 4, right: 6, width: 8, height: 8, backgroundColor: '#DD4B85', borderRadius: 4, borderWidth: 1, borderColor: bgColor }} />
+          {/* <View style={{ position: 'absolute', top: 4, right: 6, width: 8, height: 8, backgroundColor: '#DD4B85', borderRadius: 4, borderWidth: 1, borderColor: bgColor }} /> */}
         </TouchableOpacity>
 
       </View>

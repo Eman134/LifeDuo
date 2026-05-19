@@ -34,7 +34,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
           if (route.name === 'index') label = 'INÍCIO';
           else if (route.name === 'connect') label = 'CONEXÃO';
           else if (route.name === 'tasks') label = 'TAREFAS';
-          else if (route.name === 'places') label = 'LUGARES';
+          else if (route.name === 'goals') label = 'METAS';
           else if (route.name === 'gifts') label = 'MIMOS';
           else if (route.name === 'more') label = 'PERFIL';
 
@@ -118,8 +118,8 @@ function TabBarItem({ routeName, label, isFocused, onPress, onLongPress, inactiv
         return <MaterialCommunityIcons name="heart" size={24} color={color} />;
       case 'tasks':
         return <Feather name="check-circle" size={24} color={color} />;
-      case 'places':
-        return <MaterialCommunityIcons name="map-marker" size={24} color={color} />;
+      case 'goals':
+        return <MaterialCommunityIcons name="airplane" size={24} color={color} />;
       case 'gifts':
         return <MaterialCommunityIcons name="gift" size={24} color={color} />;
       case 'more':

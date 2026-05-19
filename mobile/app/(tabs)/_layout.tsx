@@ -16,7 +16,7 @@ export default function TabLayout() {
       <Tabs.Screen name="index" options={{ title: 'INÍCIO' }} />
       <Tabs.Screen name="connect" options={{ title: 'CONEXÃO' }} />
       <Tabs.Screen name="tasks" options={{ title: 'TAREFAS' }} />
-      <Tabs.Screen name="places" options={{ title: 'LUGARES' }} />
+      <Tabs.Screen name="goals" options={{ title: 'METAS' }} />
       <Tabs.Screen name="gifts" options={{ title: 'MIMOS' }} />
       <Tabs.Screen name="more" options={{ title: 'PERFIL' }} />
     </Tabs>
