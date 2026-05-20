@@ -1,0 +1,57 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+title UC-03 - Sequência Enviar Presente Digital
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+participant "Gateway de Pagamento" as Payment
+database "PostgreSQL" as DB
+
+Parceiro -> Mobile : selecionarGift()
+activate Mobile
+
+Mobile -> API : POST /gifts
+activate API
+
+API -> Payment : processar pagamento
+activate Payment
+Payment --> API : aprovado
+deactivate Payment
+
+API -> DB : salvar presente
+activate DB
+DB --> API : salvo
+deactivate DB
+
+API --> Mobile : 201 + animação de surpresa
+deactivate API
+
+Mobile --> Parceiro : exibir presente enviado
+deactivate Mobile
+
+note right of API
+  CO-02 — Pós-condições:
+  pagamento aprovado, presente persistido
+  e par notificado com animação.
+end note
+
+@enduml

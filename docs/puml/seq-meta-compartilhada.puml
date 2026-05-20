@@ -1,6 +1,4 @@
 @startuml
-
-left to right direction
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -11,6 +9,7 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
@@ -20,23 +19,37 @@ skinparam databaseBackgroundColor #F8BBD0
 skinparam collectionsBackgroundColor #F8BBD0
 skinparam collectionsBorderColor #C2185B
 
-title LifeDuo - Descricao de Atores
-left to right direction
+autonumber
+title UC-03 - Sequência Criar Meta Compartilhada
 
-actor "Parceiro A e Parceiro B" as Partner
-actor "Administrador" as Admin
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+database "PostgreSQL" as DB
 
-rectangle "Sistema LifeDuo" as System {
-}
+Parceiro -> Mobile : preencherMeta(nome, valorAlvo, prazo)
+activate Mobile
 
-Partner --> System
-Admin --> System
+Mobile -> API : POST /goals
+activate API
 
-note right of Partner
-Usuário principal do app:
-- check-in
-- metas
-- presentes
+API -> API : validarDados(nome, valorAlvo, prazo)
+
+API -> DB : salvar meta do casal
+activate DB
+DB --> API : meta persistida
+deactivate DB
+
+API --> Mobile : 201 + metaCriada
+deactivate API
+
+Mobile --> Parceiro : exibir meta com progresso inicial
+deactivate Mobile
+
+note right of API
+  CO-03 — Pós-condições:
+  meta criada, visível para ambos os parceiros
+  e progresso inicial definido como zero.
 end note
 
 @enduml

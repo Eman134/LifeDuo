@@ -1,4 +1,38 @@
 @startuml
+left to right direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+skinparam collectionsBackgroundColor #F8BBD0
+skinparam collectionsBorderColor #C2185B
+
+left to right direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #FFF0F5
+  BorderColor #E07AA0
+  FontSize 12
+}
+skinparam actor {
+  BackgroundColor #FCE4EC
+  BorderColor #E07AA0
+}
+skinparam ArrowColor #555555
+
 title UC-07 - Sequencia Gerar Missao Semanal
 autonumber
 

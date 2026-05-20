@@ -1,6 +1,6 @@
 @startuml
+title UC-01 - Sequência Check-in Diário
 
-left to right direction
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -20,23 +20,39 @@ skinparam databaseBackgroundColor #F8BBD0
 skinparam collectionsBackgroundColor #F8BBD0
 skinparam collectionsBorderColor #C2185B
 
-title LifeDuo - Descricao de Atores
-left to right direction
+autonumber
 
-actor "Parceiro A e Parceiro B" as Partner
-actor "Administrador" as Admin
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+database "PostgreSQL" as DB
+collections "Redis" as Redis
 
-rectangle "Sistema LifeDuo" as System {
-}
+Parceiro -> Mobile : registrarHumor(humor)
+activate Mobile
 
-Partner --> System
-Admin --> System
+Mobile -> API : POST /checkins
+activate API
 
-note right of Partner
-Usuário principal do app:
-- check-in
-- metas
-- presentes
+API -> DB : salvar check-in e atualizar streak
+activate DB
+DB --> API : persistido
+deactivate DB
+
+API -> Redis : sincronizar streak em cache
+activate Redis
+Redis --> API : cache atualizado
+deactivate Redis
+
+API --> Mobile : 201 + streakAtual + xpGanho
+deactivate API
+
+Mobile --> Parceiro : exibir humor, streak e XP
+deactivate Mobile
+
+note right of API
+  CO-01 — Pós-condições:
+  check-in persistido, streak e XP atualizados.
 end note
 
 @enduml
