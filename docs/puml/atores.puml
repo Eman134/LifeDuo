@@ -1,0 +1,36 @@
+@startuml
+
+left to right direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #FFF0F5
+  BorderColor #E07AA0
+  FontSize 12
+}
+skinparam actor {
+  BackgroundColor #FCE4EC
+  BorderColor #E07AA0
+}
+skinparam ArrowColor #555555
+
+title LifeDuo - Descricao de Atores
+left to right direction
+
+actor "Parceiro A e Parceiro B" as Partner
+actor "Administrador" as Admin
+
+rectangle "Sistema LifeDuo" as System {
+}
+
+Partner --> System
+Admin --> System
+
+note right of Partner
+Usuário principal do app:
+- check-in
+- metas
+- presentes
+end note
+
+@enduml

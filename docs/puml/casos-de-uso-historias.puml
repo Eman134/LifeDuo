@@ -1,0 +1,56 @@
+@startuml
+title LifeDuo - Diagrama de Casos de Uso
+left to right direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #FFF0F5
+  BorderColor #E07AA0
+  FontSize 12
+}
+skinparam actor {
+  BackgroundColor #FCE4EC
+  BorderColor #E07AA0
+}
+skinparam ArrowColor #555555
+
+actor "Parceiro A\nParceiro B" as Partner
+actor "Administrador" as Admin
+
+rectangle "LifeDuo" {
+  package "Conexão Diária" {
+    usecase "UC-01 Realizar check-in\nde humor diário" as UC1
+    usecase "UC-02 Manter streak e\ncumprir missões semanais" as UC2
+    usecase "UC-09 Receber notificações\nem tempo real" as UC9
+  }
+  package "Planejamento" {
+    usecase "UC-03 Gerenciar metas,\nnotas e listas" as UC3
+    usecase "UC-05 Gerenciar datas especiais\ne enviar presente digital" as UC5
+  }
+  package "Mascote e Gamificação" {
+    usecase "UC-04 Personalizar e\nevoluir mascote virtual" as UC4
+    usecase "UC-07 Jogar quizzes e\nreceber dicas diárias" as UC7
+  }
+  package "Memórias e Lugares" {
+    usecase "UC-06 Salvar lugares,\nregistrar memórias e desafios" as UC6
+  }
+  package "Bem-estar" {
+    usecase "UC-08 Registrar informações\nde saúde e bem-estar" as UC8
+  }
+  package "Administração" {
+    usecase "UC-10 Moderar conteúdo\nda plataforma" as UC10
+  }
+}
+
+Partner --> UC1
+Partner --> UC2
+Partner --> UC3
+Partner --> UC4
+Partner --> UC5
+Partner --> UC6
+Partner --> UC7
+Partner --> UC8
+Partner --> UC9
+Admin --> UC10
+
+@enduml
