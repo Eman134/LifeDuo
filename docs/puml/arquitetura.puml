@@ -1,0 +1,93 @@
+@startuml
+title LifeDuo - Arquitetura
+
+top to bottom direction
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam componentStyle rectangle
+skinparam roundcorner 12
+
+skinparam ArrowColor #880E4F
+skinparam ArrowThickness 1.5
+
+skinparam ActorBorderColor #C2185B
+skinparam ActorBackgroundColor #F48FB1
+
+skinparam RectangleBorderColor #C2185B
+skinparam RectangleBackgroundColor #FFF1F7
+
+skinparam ComponentBorderColor #C2185B
+skinparam ComponentBackgroundColor #F8BBD0
+skinparam ComponentFontColor #4A004E
+
+skinparam DatabaseBorderColor #AD1457
+skinparam DatabaseBackgroundColor #FCE4EC
+
+skinparam PackageBorderColor #C2185B
+skinparam PackageBackgroundColor #FFF8FB
+
+skinparam defaultTextAlignment center
+
+actor "Parceiro A/B" as Partner
+actor "Administrador" as Admin
+
+package "Clientes" {
+
+  rectangle "Aplicações" {
+
+    component "App Mobile" as Mobile
+    component "Portal Admin" as AdminPortal
+
+  }
+
+}
+
+package "Backend (NestJS)" {
+
+  component "API REST" as Api
+  component "Realtime\n(Socket.IO)" as Realtime
+  component "Jobs Assíncronos\n(BullMQ)" as Jobs
+  component "Scheduler\n(Cron)" as Cron
+
+}
+
+package "Camada de Dados" {
+
+  database "PostgreSQL" as Db
+  database "Redis" as Redis
+
+}
+
+package "Integrações Externas" {
+
+  cloud "Firebase Cloud Messaging\n(FCM)" as FCM
+  cloud "Gateway de Pagamento" as Payment
+  cloud "Map Service\n(Geocoding)" as MapService
+
+}
+
+Partner --> Mobile : utiliza
+Admin --> AdminPortal : gerencia
+
+Mobile --> Api : REST API
+AdminPortal --> Api : REST API
+
+Api --> Db : persistência
+Api --> Redis : cache / sessões
+
+Api --> Realtime : publica eventos
+Realtime --> Mobile : eventos realtime
+
+Api --> FCM : push offline
+Jobs --> FCM : notificações agendadas
+FCM --> Mobile : push notifications
+
+Cron --> Jobs : agenda execuções
+Jobs --> Db : atualizações internas
+
+
+Mobile --> MapService : reverse geocoding
+Api --> Payment : pagamentos
+
+@enduml
