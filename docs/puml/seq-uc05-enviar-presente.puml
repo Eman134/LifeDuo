@@ -18,7 +18,7 @@ skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
 
 autonumber
-title UC-03 - Sequência Enviar Presente Digital
+title UC-05 - Sequência Enviar Presente Digital
 
 actor Parceiro
 participant "App Mobile" as Mobile
