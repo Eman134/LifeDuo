@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+title UC-04 - Sequência Personalizar e Evoluir Mascote Virtual
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+database "PostgreSQL" as DB
+
+Parceiro -> Mobile : abrirTelaMascote()
+activate Mobile
+Mobile -> API : GET /mascote
+activate API
+API -> DB : buscarEstadoMascote(casalId)
+activate DB
+DB --> API : estadoMascote
+deactivate DB
+API --> Mobile : 200 + estadoMascote
+deactivate API
+Mobile -> Parceiro : exibirOpcoesCustomizacao
+
+Parceiro -> Mobile : aplicarCustomizacao(roupaId)
+activate Mobile
+Mobile -> API : PUT /mascote/customizar {roupaId}
+activate API
+API -> API : validarCustomizacao
+API -> DB : salvarCustomizacao
+activate DB
+DB --> API : persistido
+deactivate DB
+API --> Mobile : 200 + mascoteAtualizado
+deactivate API
+Mobile --> Parceiro : mostrarMascoteAtualizado
+deactivate Mobile
+
+note right of API
+  CO-04 — Pós-condições:
+  customização persistida; XP/estado do mascote atualizado quando aplicável.
+end note
+
+@enduml

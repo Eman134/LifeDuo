@@ -1,0 +1,60 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+title UC-10 - Sequência Moderar Conteúdo da Plataforma
+
+actor Administrador
+participant "Admin Portal" as Portal
+participant "API NestJS" as API
+database "PostgreSQL" as DB
+participant "NotificationService" as Notification
+
+Administrador -> Portal : listarConteudoPendentes()
+activate Portal
+Portal -> API : GET /moderation/pending
+activate API
+API -> DB : buscarConteudoPendentes
+activate DB
+DB --> API : listaConteudos
+deactivate DB
+API --> Portal : 200 + lista
+
+Portal -> Administrador : exibirLista
+
+Administrador -> Portal : aprovarConteudo(contentId)
+activate Portal
+Portal -> API : POST /moderation/approve {contentId}
+activate API
+API -> DB : marcarComoAprovado(contentId)
+activate DB
+DB --> API : atualizado
+deactivate DB
+API -> Notification : notificarCriador(contentId, aprovado)
+Notification --> API : enviado
+API --> Portal : 200
+Portal --> Administrador : confirmarAprovacao
+deactivate Portal
+
+note right of API
+  CO-10 — Pós-condições:
+  conteúdo moderado e autor notificado quando aplicável.
+end note
+
+@enduml

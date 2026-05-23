@@ -1,0 +1,91 @@
+@startuml
+skinparam StateBackgroundColor #F8BBD0
+skinparam StateBorderColor #C2185B
+skinparam ArrowColor #880E4F
+skinparam StateEndColor #AD1457
+skinparam StateStartColor #C2185B
+skinparam FontName Arial
+
+title UC-07 - Missão Semanal\nDiagrama de Estados
+
+[*] --> Agendada
+
+state "Agendada" as Agendada {
+  Agendada : idMissao = gerado()
+  Agendada : statusMissao = "agendada"
+  Agendada : dataVencimento = setado
+}
+
+Agendada --> Atribuida : [cron_dispara]\ncriarMissao()\nmarcarAgenda()
+
+state "Atribuída" as Atribuida {
+  Atribuida : casalId = atribuido
+  Atribuida : statusMissao = "atribuida"
+  Atribuida : dataInicio = agora()
+}
+
+Atribuida --> EmProgresso : [parceiro_inicia]\ncriarTarefasLocal()
+Atribuida --> Cancelada : [cancelada_por_admin]\nnotificarCasal()
+
+state "Em Progresso" as EmProgresso {
+  EmProgresso : progressoMissao = inicializado
+  EmProgresso : statusMissao = "em_progresso"
+  EmProgresso : evidenciasArmazenadas = []
+}
+
+EmProgresso --> EmRevisao : [evidencia_requerida]\nsolicitarEvidencia()
+
+EmProgresso --> Concluida : [criterios_atingidos]\nconcederXP(baseValue)\nregistrarConclusao()
+
+EmProgresso --> Expirada : [prazo_venceu]\nmarcarExpirada()\nnotificarCasal()
+
+state "Em Revisão" as EmRevisao {
+  EmRevisao : statusMissao = "em_revisao"
+  EmRevisao : evidenciasPendentes = true
+}
+
+EmRevisao --> Concluida : [evidencia_validada]\nconcederXP()
+
+state "Concluída" as Concluida {
+  Concluida : statusMissao = "concluida"
+  Concluida : dataEncerramento = agora()
+  Concluida : xpConcedido = calculado
+}
+
+Concluida --> Arquivada : [pos_processamento]\ngerarCertificado()\narquivarMissao()
+
+state "Expirada" as Expirada {
+  Expirada : statusMissao = "expirada"
+  Expirada : motivoEncerramento = "timeout"
+}
+
+Expirada --> Arquivada : arquivarMissao()
+
+state "Cancelada" as Cancelada {
+  Cancelada : statusMissao = "cancelada"
+  Cancelada : motivoCancelamento = registrado
+}
+
+Cancelada --> Arquivada : arquivarMissao()
+
+state "Arquivada" as Arquivada {
+  Arquivada : statusMissao = "arquivada"
+  Arquivada : dataArquivamento = agora()
+}
+
+Arquivada --> [*]
+
+note as LegendaMissao
+  **Transições principais:**
+  • [cron_dispara] → Atribuída
+  • [parceiro_inicia] → Em Progresso
+  • [criterios_atingidos] → Concluída
+  • [prazo_venceu] → Expirada
+  • [cancelada_por_admin] → Cancelada
+  • [evidencia_requerida] → Em Revisão
+  
+  **Estados finais:**
+  • Concluída, Expirada, Cancelada → Arquivada
+end note
+
+@enduml

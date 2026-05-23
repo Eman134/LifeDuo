@@ -1,5 +1,4 @@
 @startuml
-left to right direction
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -19,24 +18,10 @@ skinparam databaseBackgroundColor #F8BBD0
 skinparam collectionsBackgroundColor #F8BBD0
 skinparam collectionsBorderColor #C2185B
 
-left to right direction
-skinparam backgroundColor #FAFAFA
-skinparam shadowing false
-skinparam usecase {
-  BackgroundColor #FFF0F5
-  BorderColor #E07AA0
-  FontSize 12
-}
-skinparam actor {
-  BackgroundColor #FCE4EC
-  BorderColor #E07AA0
-}
-skinparam ArrowColor #555555
-
-title UC-07 - Sequencia Gerar Missao Semanal
 autonumber
+title UC-07 - Sequência Gerar Missão Semanal
 
-actor "Scheduler" as Cron
+actor "Scheduler (Cron)" as Cron
 participant "MissionJob (BullMQ)" as Job
 participant "MissionFactory" as Factory
 participant "MissionService" as Service
@@ -44,19 +29,31 @@ database "PostgreSQL" as DB
 participant "NotificationService" as Notification
 participant "FCM" as FCM
 
-Cron -> Job: disparar fila semanal
-Job -> Factory: criarMissao(tipo)\n<<Factory>>
-Factory --> Job: Missao
-Job -> Service: atribuirMissaoAoCasal(missao)
-Service -> DB: salvar missao
-Service -> Notification: notificarNovaMissao()
-Notification -> FCM: push "Nova missao da semana"
-FCM --> Notification: confirmado
+Cron -> Job : dispararFilaSemanal()
+activate Job
+Job -> Factory : criarMissao(tipoSemana)
+activate Factory
+Factory --> Job : Missao(template)
+deactivate Factory
 
-note right of Factory
-Contrato de Operacao (CO-02)
-Pre: agenda semanal ativa.
-Pos: missao criada e atribuida ao casal.
+Job -> Service : atribuirMissaoAoCasal(missao)
+activate Service
+Service -> DB : salvarMissao(missao)
+activate DB
+DB --> Service : persistido
+deactivate DB
+Service -> Notification : notificarNovaMissao(casalId, missao)
+activate Notification
+Notification -> FCM : push("Nova missão da semana")
+FCM --> Notification : entregue
+deactivate Notification
+
+Job --> Cron : concluido
+deactivate Job
+
+note right of Service
+  CO-07 — Pós-condições:
+  missões geradas e atribuídas; notificações enviadas.
 end note
-@enduml
 
+@enduml

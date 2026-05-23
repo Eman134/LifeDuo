@@ -1,0 +1,51 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+title UC-06 - Sequência Salvar Lugar e Registrar Memória
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+database "PostgreSQL" as DB
+participant "MapService (Geocoding)" as Map
+
+Parceiro -> Mobile : marcarLugar(nome, coords, foto)
+activate Mobile
+Mobile -> Map : reverseGeocode(coords)
+activate Map
+Map --> Mobile : endereco
+deactivate Map
+Mobile -> API : POST /places {coords, nome, foto}
+activate API
+API -> DB : salvarLugar(memoria)
+activate DB
+DB --> API : salvo
+deactivate DB
+API --> Mobile : 201 + lugarSalvo
+deactivate API
+Mobile --> Parceiro : exibirLugarNoMapa
+deactivate Mobile
+
+note right of API
+  CO-06 — Pós-condições:
+  lugar persistido; mapa de memórias atualizado para o casal.
+end note
+
+@enduml

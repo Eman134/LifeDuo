@@ -1,0 +1,78 @@
+@startuml
+skinparam StateBackgroundColor #F8BBD0
+skinparam StateBorderColor #C2185B
+skinparam ArrowColor #880E4F
+skinparam StateEndColor #AD1457
+skinparam StateStartColor #C2185B
+skinparam FontName Arial
+
+title UC-02 - Streak\nDiagrama de Estados
+
+[*] --> Inativo
+
+state "Inativo" as Inativo {
+  Inativo : streakAtivo = false
+  Inativo : contadorStreak = 0
+  Inativo : dataInicio = null
+}
+
+Inativo --> Ativo : [ambos_fazem_checkin]\niniciarContagem()\narmazenarEmRedis()
+
+state "Ativo" as Ativo {
+  Ativo : streakAtivo = true
+  Ativo : contadorDias = iniciado
+  Ativo : protegido = false
+}
+
+Ativo --> Protegido : [aplicar_freeze]\nativarProtecao()\nsalvarVigencia()
+
+Ativo --> Quebrado : [falha_de_um_par and not protegido]\nresetContagem()\nnotificarCasal()
+
+state "Protegido" as Protegido {
+  Protegido : protegido = true
+  Protegido : dataExpiracao = setada
+  Protegido : freezeAtivo = true
+}
+
+Protegido --> Ativo : [freeze_expira]\nliberarProtecao()
+
+state "Quebrado" as Quebrado {
+  Quebrado : streakAtivo = false
+  Quebrado : contadorStreak = 0
+  Quebrado : motivoQuebra = registrado
+}
+
+' === LOSANGO: Decisão de restauração ===
+state VerificacaoRestauracao <<choice>>
+
+Quebrado --> VerificacaoRestauracao : verificarOpcaoRestauracao()
+
+VerificacaoRestauracao --> Restaurado : [restauracao_manual]\nrecuperarStreak(parcial)
+
+VerificacaoRestauracao --> Restaurado : [reconquistar]\nreiniciarContagem()
+
+VerificacaoRestauracao --> Inativo : [sem_acao]\nmanterId()
+
+state "Restaurado" as Restaurado {
+  Restaurado : streakAtivo = true
+  Restaurado : contadorStreak = resetado
+  Restaurado : protetoAutomatico = true
+}
+
+Restaurado --> Ativo : ativarNovoStreak()
+
+note as LegendaStreak
+  **Transições principais:**
+  • [ambos_fazem_checkin] → Ativo
+  • [aplicar_freeze] → Protegido
+  • [freeze_expira] → Ativo
+  • [falha_de_um_par and not protegido] → Quebrado
+  • [restauracao_manual or reconquistar] → Restaurado
+  
+  **Estados especiais:**
+  • Protegido: impede quebra durante vigência
+  • Quebrado: perde contagem, precisa restaurar
+  • Restaurado: reinicia com proteção automática
+end note
+
+@enduml

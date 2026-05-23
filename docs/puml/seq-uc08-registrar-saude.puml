@@ -1,0 +1,48 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+title UC-08 - Sequência Registrar Informações de Saúde e Bem-estar
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+database "PostgreSQL (encrypted)" as DB
+
+Parceiro -> Mobile : abrirFormSaude(dados, consentimento)
+activate Mobile
+Mobile -> API : POST /health {dados, consentimento}
+activate API
+API -> API : validarConsentimento(consentimento)
+API -> API : criptografarDados(dados)
+API -> DB : salvarDadosCriptografados
+activate DB
+DB --> API : salvo
+deactivate DB
+API --> Mobile : 201 + confirmacao
+deactivate API
+Mobile --> Parceiro : exibirConfirmacao
+deactivate Mobile
+
+note right of API
+  CO-08 — Pós-condições:
+  dados de saúde persistidos de forma segura e acessível apenas por consentimento.
+end note
+
+@enduml

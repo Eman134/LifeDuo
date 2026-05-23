@@ -1,0 +1,59 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+title UC-09 - Sequência Receber Notificações em Tempo Real
+
+actor Parceiro
+participant "App Mobile (Socket)" as Mobile
+participant "API NestJS" as API
+participant "Socket Server (Socket.IO)" as Socket
+participant "FCM" as FCM
+
+Parceiro -> Mobile : abrirApp()
+activate Mobile
+Mobile -> Socket : conectarSocket(token)
+activate Socket
+Socket --> Mobile : connected
+
+note over API,Socket
+  Eventos em tempo real: check-in, presentes, missões, localização.
+end note
+
+API -> Socket : emitirEvento("checkin", payload)
+activate Socket
+Socket --> Mobile : pushSocket("checkin", payload)
+deactivate Socket
+
+alt se cliente offline
+  API -> FCM : enviarPush(payload)
+  FCM --> Mobile : pushNotification
+end
+
+Socket --> API : ackEvent
+
+Mobile --> Parceiro : exibirNotificacaoEmTempoReal
+deactivate Mobile
+
+note right of API
+  CO-09 — Pós-condições:
+  evento entregue via socket ou fallback para push.
+end note
+
+@enduml

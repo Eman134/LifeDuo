@@ -1,0 +1,58 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+skinparam collectionsBackgroundColor #F8BBD0
+skinparam collectionsBorderColor #C2185B
+
+autonumber
+title UC-02 - Sequência Manter Streak e Cumprir Missão Semanal
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "API NestJS" as API
+collections "Redis (streak)" as Redis
+participant "MissionService" as Mission
+database "PostgreSQL" as DB
+
+Parceiro -> Mobile : concluirAçaoDiaria(action)
+activate Mobile
+Mobile -> API : POST /actions
+activate API
+API -> DB : registrarAçao
+activate DB
+DB --> API : gravado
+deactivate DB
+API -> Redis : atualizarStreak(casalId)
+activate Redis
+Redis --> API : streakAtual
+deactivate Redis
+API -> Mission : verificarMissaoPorStreak(streakAtual)
+activate Mission
+Mission --> API : missaoAtualizada? / progresso
+deactivate Mission
+API --> Mobile : 201 + {streakAtual, missaoStatus}
+deactivate API
+Mobile --> Parceiro : exibirStreakEMissao
+deactivate Mobile
+
+note right of API
+  CO-02 — Pós-condições:
+  streak atualizado; missões avaliadas e progresso persistido.
+end note
+
+@enduml
