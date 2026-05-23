@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="LifeDuo-logo-transparent.png" alt="Logo LifeDuo" width="180"/>
+</div>
+
 # 💑 LifeDuo 🐾
 
 > [!NOTE]
@@ -13,7 +17,7 @@
     </td>
     <td>
       <div align="center">
-        <img src="docs/LifeDuo-logo.png" alt="Logo LifeDuo" width="120px"/>
+        <img src="LifeDuo-logo.png" alt="Logo LifeDuo" width="120px"/>
       </div>
     </td>
   </tr>
@@ -41,7 +45,7 @@
 - [Funcionalidades Principais](#-funcionalidades-principais)
 - [Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [Arquitetura](#-arquitetura)
-  - [Exemplos de Diagramas](#exemplos-de-diagramas)
+  - [Diagramas](#diagramas)
 - [Instalação e Execução](#-instalação-e-execução)
 - [Estrutura de Pastas](#-estrutura-de-pastas)
 - [Documentações utilizadas](#-documentações-utilizadas)
@@ -151,7 +155,6 @@ O **LifeDuo** existe porque relacionamentos saudáveis se constroem nas pequenas
 | Tecnologia | Finalidade |
 |---|---|
 | **Docker + Docker Compose** | Containerização do ambiente local |
-| **Railway** | Deploy do back-end e banco de dados |
 | **Expo EAS** | Build e distribuição do app nas lojas |
 | **GitHub Actions** | CI/CD — testes, lint e build automatizados |
 | **SonarQube** | Análise de qualidade de código |
@@ -170,6 +173,13 @@ O LifeDuo adota **Clean Architecture** combinada com princípios de **DDD (Domai
 - **Redis como camada de cache:** Streak ativo, estado do mascote e sessão do casal são mantidos em cache para baixa latência.
 - **Privacidade por design:** Dados do ciclo menstrual e localização são opt-in explícito e criptografados em repouso.
 
+**Infraestrutura (diagrama de implantação):**
+
+- **Amazon CloudFront:** CDN para distribuição de assets públicos e redução de latência no app.
+- **Elastic Load Balancer (ELB):** Camada de entrada com balanceamento das requisições da API.
+- **Amazon EC2:** Instâncias que executam o back-end (NestJS/Socket.IO) e jobs assíncronos.
+- **Amazon RDS (PostgreSQL):** Banco relacional gerenciado com backups e alta disponibilidade.
+
 **Padrões de design adotados:**
 - Repository Pattern (Prisma + camada de abstração)
 - Service Layer com casos de uso isolados
@@ -177,19 +187,30 @@ O LifeDuo adota **Clean Architecture** combinada com princípios de **DDD (Domai
 - Observer (eventos de domínio para gamificação)
 - Factory para criação de missões e conquistas
 
-### Exemplos de diagramas
+### Diagramas
 
 Para melhor visualização e entendimento da estrutura do sistema, os diagramas principais estão organizados abaixo.
 
-- Descrição de atores
-- Modelos de casos de uso e histórias de usuário
-- Diagrama de sequência do sistema e contrato de operações
-- Arquitetura
-- Diagrama de componentes e implantação
-- Diagrama de Classes
-- Diagrama de Sequência
-- Diagrama de Comunicação
-- Diagrama de Estados
+#### Diagrama de Atores
+![Diagrama de Atores](docs/diagrama-atores.png)
+
+#### Diagrama de Casos de Uso
+![Diagrama de Casos de Uso](docs/diagrama-casos-de-uso.png)
+
+#### Diagrama de Arquitetura
+![Diagrama de Arquitetura](docs/diagrama-arquitetura.png)
+
+#### Diagrama de Implantação
+![Diagrama de Implantação](docs/diagrama-de-implantacao.png)
+
+#### Diagrama de Sequência — Check-in Diário
+![Diagrama de Sequência — Check-in Diário](docs/diagrama-seq-checkin-diario.png)
+
+#### Diagrama de Sequência — Gift Center
+![Diagrama de Sequência — Gift Center](docs/diagrama-seq-gift-center.png)
+
+#### Diagrama de Sequência — Meta Compartilhada
+![Diagrama de Sequência — Meta Compartilhada](docs/diagrama-seq-meta-compartilhada.png)
 
 > [!NOTE]
 > Os diagramas acima foram gerados com **PlantUML**. Os arquivos-fonte `.puml` estão disponíveis em `/docs/puml/`.
@@ -244,10 +265,7 @@ lifeduo/
 
 * [**Engenharia de Software PUC Minas**](https://www.instagram.com/engsoftwarepucminas/) — Pelo apoio institucional, estrutura acadêmica e fomento à inovação e boas práticas de engenharia.
 * [**Prof. Dr. João Paulo Aramuni**](https://github.com/joaopauloaramuni) — Pelos valiosos ensinamentos sobre **Arquitetura de Software**, **Padrões de Projeto** e pelo template que norteou esta documentação.
-* [**Rodrigo Branas**](https://branas.io/) — Pela didática excepcional em **Clean Architecture** e **Clean Code**.
 * [**Fernanda Kipper**](https://www.instagram.com/kipper.dev/) — Pelos ensinamentos em **React Native** e melhores práticas de **Front-end mobile**.
-* [**Código Fonte TV**](https://codigofonte.tv/) — Pelo vasto conteúdo e cobertura da comunidade de desenvolvimento.
-
 ---
 
 ## 📄 Licença
