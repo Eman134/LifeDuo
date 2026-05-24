@@ -1,4 +1,6 @@
 @startuml
+title UC-03 - Sequência Criar Meta Compartilhada
+
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -9,47 +11,48 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
-skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
 skinparam sequenceMessageFontColor #880E4F
 skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
-skinparam collectionsBackgroundColor #F8BBD0
-skinparam collectionsBorderColor #C2185B
 
 autonumber
-title UC-03 - Sequência Criar Meta Compartilhada
 
 actor Parceiro
 participant "App Mobile" as Mobile
-participant "API NestJS" as API
+participant "GoalController" as Controller
+participant "GoalService" as GoalService
 database "PostgreSQL" as DB
 
 Parceiro -> Mobile : preencherMeta(nome, valorAlvo, prazo)
 activate Mobile
 
-Mobile -> API : POST /goals
-activate API
+Mobile -> Controller : POST /goals
+activate Controller
 
-API -> API : validarDados(nome, valorAlvo, prazo)
+Controller -> GoalService : createGoal(coupleId, title, targetValue)
+activate GoalService
 
-API -> DB : salvar meta do casal
+GoalService -> DB : salvar meta
 activate DB
-DB --> API : meta persistida
+DB --> GoalService : meta persistida
 deactivate DB
 
-API --> Mobile : 201 + metaCriada
-deactivate API
+GoalService --> Controller : 200 + goal
+deactivate GoalService
+
+Controller --> Mobile : celebração + meta criada
+deactivate Controller
 
 Mobile --> Parceiro : exibir meta com progresso inicial
 deactivate Mobile
 
-note right of API
+note right of DB
   CO-03 — Pós-condições:
-  meta criada, visível para ambos os parceiros
-  e progresso inicial definido como zero.
+  meta criada, visível para ambos os parceiros,
+  progresso inicial definido como zero.
 end note
 
 @enduml

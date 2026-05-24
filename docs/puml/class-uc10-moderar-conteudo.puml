@@ -1,0 +1,64 @@
+@startuml
+title UC-10 - Moderação da Plataforma
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class ModerationController <<Controller>> {
+    +listReports(): ContentReport[]
+    +approveContent(reportId): void
+    +rejectContent(reportId, reason): void
+  }
+}
+
+package "Service" {
+  class ModerationService <<Service>> {
+    +listReports(): ContentReport[]
+    +approve(reportId): void
+    +reject(reportId, reason): void
+  }
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+  }
+}
+
+package "Repository" {
+  class ModerationRepository <<Repository>> {
+    +save(r: ContentReport): void
+    +get(id): ContentReport
+    +update(r: ContentReport): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class ContentReport <<Entity>> {
+    +id: UUID
+    +contentId: UUID
+    +reason: String
+    +status: ReportStatus
+    +reviewedAt: DateTime
+  }
+  class Partner <<Entity>> {
+    +id: UUID
+    +name: String
+  }
+}
+
+ModerationController ..> ModerationService
+ModerationService ..> ModerationRepository
+ModerationService ..> NotificationService : <<async>>
+ModerationRepository ..> ContentReport
+ContentReport "*" o-- "1" Partner
+
+@enduml

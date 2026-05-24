@@ -1,0 +1,90 @@
+@startuml
+title UC-09 - Notificações
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class NotificationController <<Controller>> {
+    +subscribeRealtime(coupleId, token): void
+    +listNotifications(coupleId): Notification[]
+  }
+}
+
+package "Service" {
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+    +scheduleAlert(coupleId, message, date): void
+    +subscribeRealtime(coupleId, token): void
+  }
+  class DomainEventPublisher <<Subject>> {
+    +publish(event: DomainEvent): void
+    +subscribe(observer: DomainEventObserver): void
+  }
+  interface DomainEventObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  class NotificationObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  class CheckinRecordedEvent {
+    +coupleId: UUID
+    +mood: Mood
+  }
+  class StreakUpdatedEvent {
+    +coupleId: UUID
+    +count: Int
+  }
+  class GiftSentEvent {
+    +coupleId: UUID
+    +giftType: GiftType
+  }
+  interface DomainEvent <<interface>> {
+    +name: String
+    +occurredAt: DateTime
+  }
+}
+
+package "Repository" {
+  class NotificationRepository <<Repository>> {
+    +save(n: Notification): void
+    +get(id): Notification
+    +update(n: Notification): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class Notification <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +type: String
+    +payload: Map
+    +sentAt: DateTime
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+NotificationController ..> NotificationService
+NotificationService ..> NotificationRepository
+NotificationService ..> DomainEventPublisher
+DomainEventPublisher ..> DomainEventObserver
+NotificationObserver ..|> DomainEventObserver
+CheckinRecordedEvent ..|> DomainEvent
+StreakUpdatedEvent ..|> DomainEvent
+GiftSentEvent ..|> DomainEvent
+NotificationRepository ..> Notification
+Couple "1" o-- "*" Notification
+
+@enduml

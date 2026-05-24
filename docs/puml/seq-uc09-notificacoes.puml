@@ -1,0 +1,132 @@
+@startuml
+title UC-09 - Sequência Receber Notificações em Tempo Real
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "NotificationController" as Controller
+participant "NotificationService" as NotifService
+participant "Socket.IO Server" as WebSocket
+database "PostgreSQL" as DB
+
+Parceiro -> Mobile : abrirNotificacoes()
+activate Mobile
+
+Mobile -> Controller : GET /notifications
+activate Controller
+
+Controller -> NotifService : listNotifications(coupleId)
+activate NotifService
+
+NotifService -> DB : buscar notificações
+activate DB
+DB --> NotifService : notificações[]
+deactivate DB
+
+NotifService --> Controller : 200 + notifications
+deactivate NotifService
+
+Controller --> Mobile : exibir notificações
+deactivate Controller
+
+Mobile --> Parceiro : listar com timestamp
+deactivate Mobile
+
+note right of NotifService
+  Subscrição em tempo real:
+  registra listener WebSocket
+  para novos eventos
+end note
+
+Parceiro -> Mobile : permitirNotificacoes()
+activate Mobile
+
+Mobile -> Controller : POST /subscribe-realtime
+activate Controller
+
+Controller -> NotifService : subscribeRealtime(coupleId, token)
+activate NotifService
+
+NotifService -> WebSocket : registrar listener
+activate WebSocket
+WebSocket --> NotifService : pronto
+deactivate WebSocket
+
+NotifService --> Controller : 200 + subscribed
+deactivate NotifService
+
+Controller --> Mobile : conexão ativa
+deactivate Controller
+
+Mobile --> Parceiro : notificações em tempo real
+deactivate Mobile
+
+note right of WebSocket
+  DomainEvents publicados:
+  CheckinRecordedEvent, StreakUpdatedEvent,
+  GiftSentEvent, etc → disparam notificações
+end note
+
+WebSocket -> NotifService : CheckinRecordedEvent
+activate NotifService
+
+NotifService -> DB : save(notification)
+activate DB
+DB --> NotifService : salva
+deactivate DB
+
+NotifService -> WebSocket : emit push realtime
+activate WebSocket
+WebSocket --> Parceiro : notificação entregue
+deactivate WebSocket
+
+deactivate NotifService
+
+Parceiro -> Mobile : tocarNotificacao()
+activate Mobile
+
+Mobile -> Controller : POST /notifications/:id/read
+activate Controller
+
+Controller -> NotifService : markAsRead(notificationId)
+activate NotifService
+
+NotifService -> DB : update(isRead = true)
+activate DB
+DB --> NotifService : atualizado
+deactivate DB
+
+NotifService --> Controller : 200
+deactivate NotifService
+
+Controller --> Mobile : marcado como lido
+deactivate Controller
+
+Mobile --> Parceiro : sincronizar parceiro
+deactivate Mobile
+
+note right of DB
+  Pós-condições:
+  notificações entregues em tempo real via WebSocket,
+  fallback push se offline, status sincronizado.
+end note
+
+@enduml

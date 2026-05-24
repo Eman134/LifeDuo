@@ -1,0 +1,89 @@
+@startuml
+title UC-07 - Jogos e Dicas Diárias
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class GameController <<Controller>> {
+    +startGame(coupleId, type): GameSession
+    +submitAnswer(sessionId, answer): GameSession
+    +getDailyTip(coupleId): DailyTip
+  }
+}
+
+package "Service" {
+  class GameService <<Service>> {
+    +startGame(coupleId, type): GameSession
+    +submitAnswer(sessionId, answer): GameSession
+    +getDailyTip(coupleId): DailyTip
+  }
+  class GamificationService <<Service>> {
+    +grantXp(coupleId, source, amount): void
+  }
+  class MissionFactory <<Factory>> {
+    +createWeeklyTemplate(weekSeed): MissionTemplate
+    +createMission(template, coupleId): Mission
+  }
+}
+
+package "Repository" {
+  class GameRepository <<Repository>> {
+    +save(g: GameSession): void
+    +get(id): GameSession
+    +update(g: GameSession): void
+    +remove(id): void
+  }
+  class DailyTipRepository <<Repository>> {
+    +save(d: DailyTip): void
+    +get(coupleId): DailyTip
+    +update(d: DailyTip): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class GameSession <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +type: GameType
+    +score: Int
+    +completedAt: DateTime
+  }
+  class DailyTip <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +content: String
+    +actionable: String
+  }
+  class MissionTemplate <<ValueObject>> {
+    +type: String
+    +rules: String
+    +reward: String
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+GameController ..> GameService
+GameService ..> GameRepository
+GameService ..> DailyTipRepository
+GameService ..> GamificationService : <<async>>
+GameService ..> MissionFactory
+MissionFactory ..> MissionTemplate
+GameRepository ..> GameSession
+DailyTipRepository ..> DailyTip
+Couple "1" o-- "*" GameSession
+Couple "1" o-- "*" DailyTip
+
+@enduml

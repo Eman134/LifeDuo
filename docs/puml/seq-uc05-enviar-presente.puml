@@ -1,4 +1,6 @@
 @startuml
+title UC-05 - Sequência Enviar Presente Digital
+
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -9,7 +11,6 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
-skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
@@ -18,40 +19,41 @@ skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
 
 autonumber
-title UC-05 - Sequência Enviar Presente Digital
 
 actor Parceiro
 participant "App Mobile" as Mobile
-participant "API NestJS" as API
-participant "Gateway de Pagamento" as Payment
+participant "GiftController" as Controller
+participant "GiftService" as GiftService
 database "PostgreSQL" as DB
 
 Parceiro -> Mobile : selecionarGift()
 activate Mobile
 
-Mobile -> API : POST /gifts
-activate API
+Mobile -> Controller : POST /gifts
+activate Controller
 
-API -> Payment : processar pagamento
-activate Payment
-Payment --> API : aprovado
-deactivate Payment
+Controller -> GiftService : sendGift(coupleId, giftType, message)
+activate GiftService
 
-API -> DB : salvar presente
+GiftService -> DB : salvar presente
 activate DB
-DB --> API : salvo
+DB --> GiftService : persistido
 deactivate DB
 
-API --> Mobile : 201 + animação de surpresa
-deactivate API
+GiftService --> Controller : 200 + gift
+deactivate GiftService
+
+Controller --> Mobile : celebração + animação
+deactivate Controller
 
 Mobile --> Parceiro : exibir presente enviado
 deactivate Mobile
 
-note right of API
-  CO-02 — Pós-condições:
-  pagamento aprovado, presente persistido
-  e par notificado com animação.
+note right of DB
+  Pós-condições:
+  presente persistido na base,
+  eventos de notificação publicados assincronamente,
+  animação de surpresa exibida ao parceiro.
 end note
 
 @enduml

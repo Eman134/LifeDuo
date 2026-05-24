@@ -1,0 +1,119 @@
+@startuml
+title UC-07 - Quizzes e Dicas Diárias
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+autonumber
+
+actor ParceiroA
+participant "App Mobile" as Mobile
+participant "GameController" as Controller
+participant "GameService" as GameService
+participant "GamificationService" as GamService
+database "GameRepository" as GameRepo
+database "DailyTipRepository" as TipRepo
+
+ParceiroA -> Mobile : iniciarJogo(tipo)
+activate Mobile
+
+Mobile -> Controller : POST /game/start
+activate Controller
+
+Controller -> GameService : startGame(coupleId, type)
+activate GameService
+
+GameService -> GameRepo : save(novo GameSession)
+activate GameRepo
+GameRepo --> GameService : gameSession criada
+deactivate GameRepo
+
+GameService --> Controller : 200 + gameSession + questões
+deactivate GameService
+
+Controller --> Mobile : exibir jogo
+deactivate Controller
+
+Mobile --> ParceiroA : tela do jogo carregada
+deactivate Mobile
+
+ParceiroA -> Mobile : submitAnswer(answer)
+activate Mobile
+
+Mobile -> Controller : POST /game/:sessionId/answer
+activate Controller
+
+Controller -> GameService : submitAnswer(sessionId, answer)
+activate GameService
+
+GameService -> GameService : validarResposta(answer)
+
+GameService -> GameRepo : update(gameSession com score)
+activate GameRepo
+GameRepo --> GameService : atualizado
+deactivate GameRepo
+
+GameService -> GamService : grantXp(coupleId, "game_score", score)
+activate GamService
+GamService --> GameService : xp concedido
+deactivate GamService
+
+GameService --> Controller : 200 + resultadoPartida + xpGanho
+deactivate GameService
+
+Controller --> Mobile : exibir resultado
+deactivate Controller
+
+Mobile --> ParceiroA : placar e XP ganho
+deactivate Mobile
+
+note right of Controller
+  Dica Diária:
+  distribuída por vez ao dia,
+  contextualizada para cada casal
+end note
+
+ParceiroA -> Mobile : abrirAba Dicas
+activate Mobile
+
+Mobile -> Controller : GET /tips/daily
+activate Controller
+
+Controller -> GameService : getDailyTip(coupleId)
+activate GameService
+
+GameService -> TipRepo : get(coupleId)
+activate TipRepo
+TipRepo --> GameService : dicaDiaria
+deactivate TipRepo
+
+GameService --> Controller : 200 + dicaDiaria
+deactivate GameService
+
+Controller --> Mobile : exibir dica
+deactivate Controller
+
+Mobile --> ParceiroA : dica com ação sugerida para hoje
+deactivate Mobile
+
+note right of GameRepo
+  Pós-condições:
+  jogo respondido, XP ganho e persistido,
+  dica diária entregue e marcada como visualizada.
+end note
+
+@enduml

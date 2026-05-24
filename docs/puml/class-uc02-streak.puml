@@ -1,0 +1,108 @@
+@startuml
+title UC-02 - Streak e Missões Semanais
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class MissionController <<Controller>> {
+    +getCurrentMission(coupleId): Mission
+    +completeMission(missionId): Mission
+  }
+}
+
+package "Service" {
+  class CheckinService <<Service>> {
+    +recordCheckin(coupleId, partnerId, mood): CheckIn
+  }
+  class StreakService <<Service>> {
+    +updateStreak(coupleId): Streak
+    +applyFreeze(coupleId): Streak
+    +getStreak(coupleId): Streak
+  }
+  class MissionService <<Service>> {
+    +assignWeeklyMission(coupleId): Mission
+    +getCurrentMission(coupleId): Mission
+    +completeMission(missionId): Mission
+  }
+  class MissionFactory <<Factory>> {
+    +createWeeklyTemplate(weekSeed): MissionTemplate
+    +createMission(template, coupleId): Mission
+  }
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+    +scheduleAlert(coupleId, message, date): void
+  }
+  class DomainEventPublisher <<Subject>> {
+    +publish(event: DomainEvent): void
+    +subscribe(observer: DomainEventObserver): void
+  }
+  interface DomainEventObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  class GamificationObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+}
+
+package "Repository" {
+  class StreakRepository <<Repository>> {
+    +save(s: Streak): void
+    +get(coupleId): Streak
+    +update(s: Streak): void
+    +remove(id): void
+  }
+  class MissionRepository <<Repository>> {
+    +save(m: Mission): void
+    +get(id): Mission
+    +update(m: Mission): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class Streak <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +count: Int
+    +isFrozen: Boolean
+    +lastCheckinAt: DateTime
+  }
+  class Mission <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +type: String
+    +status: String
+    +progress: Int
+  }
+  class MissionTemplate <<ValueObject>> {
+    +type: String
+    +rules: String
+    +reward: String
+  }
+}
+
+MissionController ..> MissionService
+MissionController ..> StreakService
+CheckinService ..> StreakService
+StreakService ..> DomainEventPublisher : <<async>>
+DomainEventPublisher ..> DomainEventObserver
+GamificationObserver ..|> DomainEventObserver
+MissionService ..> MissionFactory
+MissionService ..> NotificationService : <<async>>
+MissionService ..> MissionRepository
+StreakService ..> StreakRepository
+StreakRepository ..> Streak
+MissionRepository ..> Mission
+MissionFactory ..> MissionTemplate
+
+@enduml

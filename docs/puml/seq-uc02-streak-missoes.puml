@@ -1,0 +1,119 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam ArrowColor #880E4F
+skinparam sequenceMessageAlign center
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+skinparam collectionsBackgroundColor #F8BBD0
+skinparam collectionsBorderColor #C2185B
+
+autonumber
+title UC-02 - Sequência Manter Streak e Cumprir Missões Semanais
+
+actor Parceiro
+participant "App Mobile" as Mobile
+participant "MissionController" as Controller
+participant "CheckinService" as CheckinService
+participant "StreakService" as StreakService
+participant "MissionService" as MissionService
+participant "NotificationService" as NotifService
+database "PostgreSQL" as DB
+
+Parceiro -> Mobile : abrirApp()
+activate Mobile
+
+Mobile -> Controller : GET /streak/current
+activate Controller
+
+Controller -> StreakService : getStreak(coupleId)
+activate StreakService
+
+StreakService -> DB : buscar streak ativo
+activate DB
+DB --> StreakService : streakData
+deactivate DB
+
+StreakService --> Controller : 200 + streakAtual
+deactivate StreakService
+
+Controller --> Mobile : exibir streak diário
+deactivate Controller
+
+Mobile --> Parceiro : mostrar dias consecutivos
+deactivate Mobile
+
+note right of MissionService
+  Missão semanal gerada automaticamente
+  todo domingo à 00:00 UTC via scheduler
+end note
+
+Parceiro -> Mobile : abrirMissãoDaSemana()
+activate Mobile
+
+Mobile -> Controller : GET /missions/current
+activate Controller
+
+Controller -> MissionService : getCurrentMission(coupleId)
+activate MissionService
+
+MissionService -> DB : buscar missão da semana
+activate DB
+DB --> MissionService : missão atual
+deactivate DB
+
+MissionService --> Controller : 200 + mission
+deactivate MissionService
+
+Controller --> Mobile : exibir missão semanal
+deactivate Controller
+
+Mobile --> Parceiro : mostrar desafio da semana
+deactivate Mobile
+
+Parceiro -> Mobile : completarMissao()
+activate Mobile
+
+Mobile -> Controller : POST /missions/:id/complete
+activate Controller
+
+Controller -> MissionService : completeMission(missionId)
+activate MissionService
+
+MissionService -> DB : atualizar status = "completed"
+activate DB
+DB --> MissionService : missão atualizada
+deactivate DB
+
+MissionService -> NotifService : sendPush(coupleId, "missão completa!")
+activate NotifService
+NotifService --> MissionService : notificação enviada
+deactivate NotifService
+
+MissionService --> Controller : 200 + missionCompleted + reward
+deactivate MissionService
+
+Controller --> Mobile : celebração + XP ganho
+deactivate Controller
+
+Mobile --> Parceiro : animação e notificação
+deactivate Mobile
+
+note right of DB
+  Pós-condições:
+  streak mantido se ambos fizeram check-in,
+  missão semanal completa e notificada aos parceiros.
+end note
+
+@enduml

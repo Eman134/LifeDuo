@@ -1,0 +1,100 @@
+@startuml
+title UC-05 - Datas Especiais e Presentes
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class GiftController <<Controller>> {
+    +sendGift(coupleId, giftType, message): Gift
+    +listGifts(coupleId): Gift[]
+  }
+  class SpecialDateController <<Controller>> {
+    +createDate(coupleId, title, date, alertDays): SpecialDate
+    +listDates(coupleId): SpecialDate[]
+  }
+}
+
+package "Service" {
+  class GiftService <<Service>> {
+    +sendGift(coupleId, giftType, message): Gift
+    +listGifts(coupleId): Gift[]
+  }
+  class SpecialDateService <<Service>> {
+    +createDate(coupleId, title, date, alertDays): SpecialDate
+    +listDates(coupleId): SpecialDate[]
+  }
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+    +scheduleAlert(coupleId, message, date): void
+  }
+  class DomainEventPublisher <<Subject>> {
+    +publish(event: DomainEvent): void
+    +subscribe(observer: DomainEventObserver): void
+  }
+  interface DomainEventObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  class NotificationObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+}
+
+package "Repository" {
+  class GiftRepository <<Repository>> {
+    +save(g: Gift): void
+    +get(id): Gift
+    +update(g: Gift): void
+    +remove(id): void
+  }
+  class SpecialDateRepository <<Repository>> {
+    +save(d: SpecialDate): void
+    +get(id): SpecialDate
+    +update(d: SpecialDate): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class Gift <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +giftType: GiftType
+    +message: String
+    +status: GiftStatus
+  }
+  class SpecialDate <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +title: String
+    +date: Date
+    +alertDaysBefore: Int
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+GiftController ..> GiftService
+SpecialDateController ..> SpecialDateService
+GiftService ..> GiftRepository
+GiftService ..> DomainEventPublisher : <<async>>
+SpecialDateService ..> SpecialDateRepository
+SpecialDateService ..> NotificationService : <<async>>
+DomainEventPublisher ..> DomainEventObserver
+NotificationObserver ..|> DomainEventObserver
+GiftRepository ..> Gift
+SpecialDateRepository ..> SpecialDate
+Couple "1" o-- "*" Gift
+Couple "1" o-- "*" SpecialDate
+
+@enduml

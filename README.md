@@ -180,13 +180,6 @@ O LifeDuo adota **Clean Architecture** combinada com princípios de **DDD (Domai
 - **Amazon EC2:** Instâncias que executam o back-end (NestJS/Socket.IO) e jobs assíncronos.
 - **Amazon RDS (PostgreSQL):** Banco relacional gerenciado com backups e alta disponibilidade.
 
-**Padrões de design adotados:**
-- Repository Pattern (Prisma + camada de abstração)
-- Service Layer com casos de uso isolados
-- DTOs para entrada/saída da API
-- Observer (eventos de domínio para gamificação)
-- Factory para criação de missões e conquistas
-
 ### Diagramas
 
 Para melhor visualização e entendimento da estrutura do sistema, os diagramas principais estão organizados abaixo.

@@ -1,4 +1,6 @@
 @startuml
+title UC-06 - Sequência Salvar Lugares e Registrar Memórias
+
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -9,7 +11,6 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
-skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
@@ -18,34 +19,84 @@ skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
 
 autonumber
-title UC-06 - Sequência Salvar Lugar e Registrar Memória
 
 actor Parceiro
 participant "App Mobile" as Mobile
-participant "API NestJS" as API
+participant "PlaceController" as Controller
+participant "PlaceService" as PlaceService
+participant "GamificationService" as GamService
+participant "NotificationService" as NotifService
 database "PostgreSQL" as DB
-participant "MapService (Geocoding)" as Map
 
-Parceiro -> Mobile : marcarLugar(nome, coords, foto)
+Parceiro -> Mobile : adicionarLugarAoWishlist(nome, coords)
 activate Mobile
-Mobile -> Map : reverseGeocode(coords)
-activate Map
-Map --> Mobile : endereco
-deactivate Map
-Mobile -> API : POST /places {coords, nome, foto}
-activate API
-API -> DB : salvarLugar(memoria)
+
+Mobile -> Controller : POST /places/add
+activate Controller
+
+Controller -> PlaceService : addPlace(coupleId, name, coords)
+activate PlaceService
+
+PlaceService -> DB : salvar lugar na wishlist
 activate DB
-DB --> API : salvo
+DB --> PlaceService : lugar persistido
 deactivate DB
-API --> Mobile : 201 + lugarSalvo
-deactivate API
-Mobile --> Parceiro : exibirLugarNoMapa
+
+PlaceService -> PlaceService : checkMatch(coupleId, placeId)
+
+alt Match encontrado
+  PlaceService -> NotifService : sendPush(coupleId, "match encontrado")
+  activate NotifService
+  NotifService --> PlaceService : notificação disparada
+  deactivate NotifService
+end
+
+PlaceService --> Controller : 201 + lugarSalvo + matchInfo?
+deactivate PlaceService
+
+Controller --> Mobile : lugar adicionado ao mapa
+deactivate Controller
+
+Mobile --> Parceiro : exibir lugar no wishlist
 deactivate Mobile
 
-note right of API
-  CO-06 — Pós-condições:
-  lugar persistido; mapa de memórias atualizado para o casal.
+note right of PlaceService
+  Registrar memória de visita:
+  quando lugar visitado, registrar com foto
+end note
+
+Parceiro -> Mobile : registrarMemoria(placeId, foto, nota)
+activate Mobile
+
+Mobile -> Controller : POST /places/memory
+activate Controller
+
+Controller -> PlaceService : markVisited(placeId)
+activate PlaceService
+
+PlaceService -> DB : marcar como visitado + salvar memória
+activate DB
+DB --> PlaceService : memória persistida
+deactivate DB
+
+PlaceService -> GamService : grantXp(coupleId, "visited_place", 50)
+activate GamService
+GamService --> PlaceService : xp concedido
+deactivate GamService
+
+PlaceService --> Controller : 201 + memoriaSalva + xpGanho
+deactivate PlaceService
+
+Controller --> Mobile : memória registrada
+deactivate Controller
+
+Mobile --> Parceiro : exibir no mapa de memórias
+deactivate Mobile
+
+note right of DB
+  Pós-condições:
+  lugar adicionado ou memória registrada,
+  ambos os parceiros veem em tempo real.
 end note
 
 @enduml

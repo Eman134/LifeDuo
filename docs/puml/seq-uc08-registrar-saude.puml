@@ -1,4 +1,6 @@
 @startuml
+title UC-08 - Sequência Registrar Saúde e Bem-estar
+
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -9,7 +11,6 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
-skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
@@ -18,31 +19,104 @@ skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
 
 autonumber
-title UC-08 - Sequência Registrar Informações de Saúde e Bem-estar
 
 actor Parceiro
 participant "App Mobile" as Mobile
-participant "API NestJS" as API
-database "PostgreSQL (encrypted)" as DB
+participant "WellnessController" as Controller
+participant "WellnessService" as WellnessService
+participant "NotificationService" as NotifService
+database "WellnessRepository" as WellnessRepo
+database "RealPetRepository" as PetRepo
 
-Parceiro -> Mobile : abrirFormSaude(dados, consentimento)
+Parceiro -> Mobile : abrirAbaSaude()
 activate Mobile
-Mobile -> API : POST /health {dados, consentimento}
-activate API
-API -> API : validarConsentimento(consentimento)
-API -> API : criptografarDados(dados)
-API -> DB : salvarDadosCriptografados
-activate DB
-DB --> API : salvo
-deactivate DB
-API --> Mobile : 201 + confirmacao
-deactivate API
-Mobile --> Parceiro : exibirConfirmacao
+
+Mobile -> Controller : GET /wellness/profile
+activate Controller
+
+Controller -> WellnessService : getWellnessProfile(coupleId)
+activate WellnessService
+
+WellnessService -> WellnessRepo : get(coupleId)
+activate WellnessRepo
+WellnessRepo --> WellnessService : wellnessRecord
+deactivate WellnessRepo
+
+WellnessService --> Controller : 200 + perfilSaude
+deactivate WellnessService
+
+Controller --> Mobile : exibir painel
+deactivate Controller
+
+Mobile --> Parceiro : mostrar dados de saúde
 deactivate Mobile
 
-note right of API
-  CO-08 — Pós-condições:
-  dados de saúde persistidos de forma segura e acessível apenas por consentimento.
+Parceiro -> Mobile : registrarCicloMenstrual(dataInicio, duracao)
+activate Mobile
+
+Mobile -> Controller : POST /wellness/menstrual
+activate Controller
+
+Controller -> WellnessService : recordWellness(coupleId, data, consent)
+activate WellnessService
+
+WellnessService -> WellnessService : encryptData(data)
+
+WellnessService -> WellnessRepo : save(registro criptografado)
+activate WellnessRepo
+WellnessRepo --> WellnessService : salvo
+deactivate WellnessRepo
+
+alt Consentimento para notificação
+  WellnessService -> NotifService : sendPush(coupleId, "ciclo próximo em X dias")
+  activate NotifService
+  NotifService --> WellnessService : notificação agendada
+  deactivate NotifService
+end
+
+WellnessService --> Controller : 201 + cicloRegistrado
+deactivate WellnessService
+
+Controller --> Mobile : confirmação
+deactivate Controller
+
+Mobile --> Parceiro : exibir ciclo registrado
+deactivate Mobile
+
+note right of WellnessService
+  Registro de pet real:
+  nome, raça, data de nascimento,
+  histórico de vacinações
+end note
+
+Parceiro -> Mobile : registrarPetReal(nome, raca, dtNasc)
+activate Mobile
+
+Mobile -> Controller : POST /wellness/pet
+activate Controller
+
+Controller -> WellnessService : updateRealPet(coupleId, data)
+activate WellnessService
+
+WellnessService -> PetRepo : save(novo RealPet)
+activate PetRepo
+PetRepo --> WellnessService : pet salvo
+deactivate PetRepo
+
+WellnessService --> Controller : 201 + petRegistrado
+deactivate WellnessService
+
+Controller --> Mobile : perfil do pet criado
+deactivate Controller
+
+Mobile --> Parceiro : exibir perfil do pet real
+deactivate Mobile
+
+note right of WellnessRepo
+  Pós-condições:
+  dados de saúde registrados com privacidade,
+  criptografia em repouso para dados sensíveis,
+  notificações agendadas se opt-in.
 end note
 
 @enduml

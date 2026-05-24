@@ -17,42 +17,42 @@ skinparam noteFontColor #880E4F
 skinparam sequenceMessageFontColor #880E4F
 skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
-skinparam collectionsBackgroundColor #F8BBD0
-skinparam collectionsBorderColor #C2185B
 
 autonumber
 
 actor Parceiro
 participant "App Mobile" as Mobile
-participant "API NestJS" as API
+participant "CheckinController" as Controller
+participant "CheckinService" as CheckinService
 database "PostgreSQL" as DB
-collections "Redis" as Redis
 
 Parceiro -> Mobile : registrarHumor(humor)
 activate Mobile
 
-Mobile -> API : POST /checkins
-activate API
+Mobile -> Controller : POST /checkins
+activate Controller
 
-API -> DB : salvar check-in e atualizar streak
+Controller -> CheckinService : recordCheckin(coupleId, partnerId, mood)
+activate CheckinService
+
+CheckinService -> DB : salvar check-in
 activate DB
-DB --> API : persistido
+DB --> CheckinService : persistido
 deactivate DB
 
-API -> Redis : sincronizar streak em cache
-activate Redis
-Redis --> API : cache atualizado
-deactivate Redis
+CheckinService --> Controller : 200 + checkIn + streak + xp
+deactivate CheckinService
 
-API --> Mobile : 201 + streakAtual + xpGanho
-deactivate API
+Controller --> Mobile : celebração + XP ganho
+deactivate Controller
 
 Mobile --> Parceiro : exibir humor, streak e XP
 deactivate Mobile
 
-note right of API
-  CO-01 — Pós-condições:
-  check-in persistido, streak e XP atualizados.
+note right of DB
+  Pós-condições:
+  check-in persistido, streak atualizado,
+  eventos de gamificação publicados assincronamente.
 end note
 
 @enduml

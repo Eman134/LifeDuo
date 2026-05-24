@@ -1,0 +1,78 @@
+@startuml
+title UC-01 - Check-in de Humor
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class CheckinController <<Controller>> {
+    +postCheckin(coupleId, mood): CheckIn
+  }
+}
+
+package "Service" {
+  class CheckinService <<Service>> {
+    +recordCheckin(coupleId, partnerId, mood): CheckIn
+    +getMoodHistory(coupleId): CheckIn[]
+  }
+  class DomainEventPublisher <<Subject>> {
+    +publish(event: DomainEvent): void
+    +subscribe(observer: DomainEventObserver): void
+  }
+  class GamificationObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  class NotificationObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  interface DomainEventObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+}
+
+package "Repository" {
+  class CheckinRepository <<Repository>> {
+    +save(c: CheckIn): void
+    +get(id): CheckIn
+    +update(c: CheckIn): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class CheckIn <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +partnerId: UUID
+    +mood: Mood
+    +createdAt: DateTime
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+  class Partner <<Entity>> {
+    +id: UUID
+    +name: String
+  }
+}
+
+CheckinController ..> CheckinService
+CheckinService ..> CheckinRepository
+CheckinService ..> DomainEventPublisher : <<async>>
+DomainEventPublisher ..> DomainEventObserver
+GamificationObserver ..|> DomainEventObserver
+NotificationObserver ..|> DomainEventObserver
+CheckinRepository ..> CheckIn
+Couple "1" o-- "2" Partner
+Couple "1" o-- "*" CheckIn
+
+@enduml

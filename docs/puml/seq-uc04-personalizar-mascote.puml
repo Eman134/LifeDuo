@@ -1,4 +1,6 @@
 @startuml
+title UC-04 - Sequência Personalizar e Evoluir Mascote
+
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -9,7 +11,6 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
-skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
@@ -18,42 +19,62 @@ skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
 
 autonumber
-title UC-04 - Sequência Personalizar e Evoluir Mascote Virtual
 
 actor Parceiro
 participant "App Mobile" as Mobile
-participant "API NestJS" as API
+participant "PetController" as Controller
+participant "PetService" as PetService
+participant "GamificationService" as GamService
 database "PostgreSQL" as DB
 
-Parceiro -> Mobile : abrirTelaMascote()
+Parceiro -> Mobile : selecionarSkinMascote(skinId)
 activate Mobile
-Mobile -> API : GET /mascote
-activate API
-API -> DB : buscarEstadoMascote(casalId)
-activate DB
-DB --> API : estadoMascote
-deactivate DB
-API --> Mobile : 200 + estadoMascote
-deactivate API
-Mobile -> Parceiro : exibirOpcoesCustomizacao
 
-Parceiro -> Mobile : aplicarCustomizacao(roupaId)
-activate Mobile
-Mobile -> API : PUT /mascote/customizar {roupaId}
-activate API
-API -> API : validarCustomizacao
-API -> DB : salvarCustomizacao
+Mobile -> Controller : POST /pet/customize
+activate Controller
+
+Controller -> PetService : customizePet(coupleId, skinId)
+activate PetService
+
+PetService -> DB : verificarPetAtual(coupleId)
 activate DB
-DB --> API : persistido
+DB --> PetService : pet com stats atuais
 deactivate DB
-API --> Mobile : 200 + mascoteAtualizado
-deactivate API
-Mobile --> Parceiro : mostrarMascoteAtualizado
+
+PetService -> PetService : validarSkinCompativel(skinId)
+
+PetService -> GamService : grantXp(coupleId, "customization", 10)
+activate GamService
+GamService -> DB : salvar XP ganho
+activate DB
+DB --> GamService : xp atualizado
+deactivate DB
+deactivate GamService
+
+PetService -> DB : atualizar mascote com nova skin
+activate DB
+DB --> PetService : pet persistido
+deactivate DB
+
+note right of PetService
+  Se novo level alcançado:
+  GamificationObserver é notificado
+  e novo achievement é desbloqueado
+end note
+
+PetService --> Controller : 200 + petAtualizado + xpGanho
+deactivate PetService
+
+Controller --> Mobile : pet customizado + animação
+deactivate Controller
+
+Mobile --> Parceiro : exibir mascote com nova aparência
 deactivate Mobile
 
-note right of API
-  CO-04 — Pós-condições:
-  customização persistida; XP/estado do mascote atualizado quando aplicável.
+note right of DB
+  Pós-condições:
+  mascote customizado e XP ganho registrado,
+  ambos os parceiros veem mudança em tempo real.
 end note
 
 @enduml

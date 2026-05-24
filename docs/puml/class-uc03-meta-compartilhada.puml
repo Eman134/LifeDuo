@@ -1,0 +1,116 @@
+@startuml
+title UC-03 - Metas, Notas e Listas
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class GoalController <<Controller>> {
+    +createGoal(coupleId, title, targetValue): Goal
+    +updateProgress(goalId, delta): Goal
+    +listGoals(coupleId): Goal[]
+  }
+  class NoteController <<Controller>> {
+    +createNote(coupleId, content, type): Note
+    +listNotes(coupleId): Note[]
+  }
+  class WishlistController <<Controller>> {
+    +addItem(coupleId, itemName): Wishlist
+    +markPurchased(itemId): Wishlist
+    +listItems(coupleId): Wishlist[]
+  }
+}
+
+package "Service" {
+  class GoalService <<Service>> {
+    +createGoal(coupleId, title, targetValue): Goal
+    +updateProgress(goalId, delta): Goal
+    +listGoals(coupleId): Goal[]
+  }
+  class NoteService <<Service>> {
+    +createNote(coupleId, content, type): Note
+    +listNotes(coupleId): Note[]
+    +removeNote(noteId): void
+  }
+  class WishlistService <<Service>> {
+    +addItem(coupleId, itemName): Wishlist
+    +markPurchased(itemId): Wishlist
+    +listItems(coupleId): Wishlist[]
+  }
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+  }
+}
+
+package "Repository" {
+  class GoalRepository <<Repository>> {
+    +save(g: Goal): void
+    +get(id): Goal
+    +update(g: Goal): void
+    +remove(id): void
+  }
+  class NoteRepository <<Repository>> {
+    +save(n: Note): void
+    +get(id): Note
+    +update(n: Note): void
+    +remove(id): void
+  }
+  class WishlistRepository <<Repository>> {
+    +save(w: Wishlist): void
+    +get(id): Wishlist
+    +update(w: Wishlist): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class Goal <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +title: String
+    +targetValue: Decimal
+    +progress: Decimal
+    +dueDate: Date
+  }
+  class Note <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +content: String
+    +type: NoteType
+    +isShared: Boolean
+  }
+  class Wishlist <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +itemName: String
+    +isPurchased: Boolean
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+GoalController ..> GoalService
+NoteController ..> NoteService
+WishlistController ..> WishlistService
+GoalService ..> NotificationService : <<async>>
+GoalService ..> GoalRepository
+NoteService ..> NoteRepository
+WishlistService ..> WishlistRepository
+GoalRepository ..> Goal
+NoteRepository ..> Note
+WishlistRepository ..> Wishlist
+Couple "1" o-- "*" Goal
+Couple "1" o-- "*" Note
+Couple "1" o-- "*" Wishlist
+
+@enduml

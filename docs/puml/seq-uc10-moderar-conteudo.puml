@@ -1,4 +1,6 @@
 @startuml
+title UC-10 - Sequência Acompanhar Relatórios e Usuários
+
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
 skinparam sequenceArrowThickness 1.5
@@ -9,7 +11,6 @@ skinparam sequenceActorBackgroundColor #F48FB1
 skinparam sequenceLifeLineBorderColor #AD1457
 skinparam sequenceArrowColor #880E4F
 skinparam ArrowColor #880E4F
-skinparam sequenceMessageAlign center
 skinparam noteBorderColor #AD1457
 skinparam noteBackgroundColor #FCE4EC
 skinparam noteFontColor #880E4F
@@ -18,43 +19,95 @@ skinparam databaseBorderColor #C2185B
 skinparam databaseBackgroundColor #F8BBD0
 
 autonumber
-title UC-10 - Sequência Moderar Conteúdo da Plataforma
 
 actor Administrador
-participant "Admin Portal" as Portal
-participant "API NestJS" as API
+participant "Dashboard Admin" as Dashboard
+participant "ModerationController" as Controller
+participant "ModerationService" as ModerationService
 database "PostgreSQL" as DB
-participant "NotificationService" as Notification
 
-Administrador -> Portal : listarConteudoPendentes()
-activate Portal
-Portal -> API : GET /moderation/pending
-activate API
-API -> DB : buscarConteudoPendentes
+Administrador -> Dashboard : acessarPainel()
+activate Dashboard
+
+Dashboard -> Controller : GET /admin/moderation/reports
+activate Controller
+
+Controller -> ModerationService : listReports()
+activate ModerationService
+
+ModerationService -> DB : buscar todos relatórios
 activate DB
-DB --> API : listaConteudos
+DB --> ModerationService : reports[]
 deactivate DB
-API --> Portal : 200 + lista
 
-Portal -> Administrador : exibirLista
+ModerationService --> Controller : 200 + reports
+deactivate ModerationService
 
-Administrador -> Portal : aprovarConteudo(contentId)
-activate Portal
-Portal -> API : POST /moderation/approve {contentId}
-activate API
-API -> DB : marcarComoAprovado(contentId)
+Controller --> Dashboard : exibir fila
+deactivate Controller
+
+Dashboard --> Administrador : listar relatórios pendentes
+deactivate Dashboard
+
+note right of ModerationService
+  Cada relatório contém:
+  - Quem reportou
+  - Conteúdo reportado
+  - Motivo da reclamação
+  - Timestamp
+end note
+
+Administrador -> Dashboard : filtrarRelatórios(filtros)
+activate Dashboard
+
+Dashboard -> Controller : GET /admin/reports?filters=usuario,data
+activate Controller
+
+Controller -> ModerationService : listFilteredReports(filtros)
+activate ModerationService
+
+ModerationService -> DB : buscar com filtros aplicados
 activate DB
-DB --> API : atualizado
+DB --> ModerationService : reports filtrados[]
 deactivate DB
-API -> Notification : notificarCriador(contentId, aprovado)
-Notification --> API : enviado
-API --> Portal : 200
-Portal --> Administrador : confirmarAprovacao
-deactivate Portal
 
-note right of API
-  CO-10 — Pós-condições:
-  conteúdo moderado e autor notificado quando aplicável.
+ModerationService --> Controller : 200 + results
+deactivate ModerationService
+
+Controller --> Dashboard : exibir filtrados
+deactivate Controller
+
+Dashboard --> Administrador : mostrar resultados
+deactivate Dashboard
+
+Administrador -> Dashboard : visualizarPerfil(userId)
+activate Dashboard
+
+Dashboard -> Controller : GET /admin/users/:userId
+activate Controller
+
+Controller -> ModerationService : getUserReport(userId)
+activate ModerationService
+
+ModerationService -> DB : histórico de reportes do usuário
+activate DB
+DB --> ModerationService : userHistory
+deactivate DB
+
+ModerationService --> Controller : 200 + perfil + histórico
+deactivate ModerationService
+
+Controller --> Dashboard : exibir dados
+deactivate Controller
+
+Dashboard --> Administrador : visualizar atividades
+deactivate Dashboard
+
+note right of DB
+  Pós-condições:
+  relatórios listados com filtros,
+  perfil de usuário com histórico,
+  acompanhamento de padrões de violação.
 end note
 
 @enduml

@@ -1,0 +1,69 @@
+@startuml
+title UC-06 - Lugares e Memórias
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class PlaceController <<Controller>> {
+    +addPlace(coupleId, name, coords): Place
+    +markVisited(placeId): Place
+    +getMemoryMap(coupleId): Place[]
+  }
+}
+
+package "Service" {
+  class PlaceService <<Service>> {
+    +addPlace(coupleId, name, coords): Place
+    +markVisited(placeId): Place
+    +checkMatch(coupleId, placeId): Boolean
+    +getMemoryMap(coupleId): Place[]
+  }
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+  }
+  class GamificationService <<Service>> {
+    +grantXp(coupleId, source, amount): void
+  }
+}
+
+package "Repository" {
+  class PlaceRepository <<Repository>> {
+    +save(p: Place): void
+    +get(id): Place
+    +update(p: Place): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class Place <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +name: String
+    +visited: Boolean
+    +latitude: Decimal
+    +longitude: Decimal
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+PlaceController ..> PlaceService
+PlaceService ..> PlaceRepository
+PlaceService ..> NotificationService : <<async>>
+PlaceService ..> GamificationService : <<async>>
+PlaceRepository ..> Place
+Couple "1" o-- "*" Place
+
+@enduml

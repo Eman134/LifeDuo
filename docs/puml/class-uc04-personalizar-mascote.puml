@@ -1,0 +1,94 @@
+@startuml
+title UC-04 - Mascote e Gamificação
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class PetController <<Controller>> {
+    +getPet(coupleId): Pet
+    +customizePet(coupleId, skinId): Pet
+  }
+}
+
+package "Service" {
+  class PetService <<Service>> {
+    +getPet(coupleId): Pet
+    +customizePet(coupleId, skinId): Pet
+    +grantXp(coupleId, amount): Pet
+    +updateMood(coupleId, mood): Pet
+  }
+  class GamificationService <<Service>> {
+    +grantXp(coupleId, source, amount): void
+    +unlockAchievement(coupleId, title): Achievement
+    +updatePetState(coupleId): void
+  }
+  class DomainEventPublisher <<Subject>> {
+    +publish(event: DomainEvent): void
+    +subscribe(observer: DomainEventObserver): void
+  }
+  interface DomainEventObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+  class GamificationObserver <<Observer>> {
+    +handle(event: DomainEvent): void
+  }
+}
+
+package "Repository" {
+  class PetRepository <<Repository>> {
+    +save(p: Pet): void
+    +get(coupleId): Pet
+    +update(p: Pet): void
+    +remove(id): void
+  }
+  class AchievementRepository <<Repository>> {
+    +save(a: Achievement): void
+    +get(id): Achievement
+    +update(a: Achievement): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class Pet <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +level: Int
+    +xp: Int
+    +mood: String
+    +skinId: String
+  }
+  class Achievement <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +title: String
+    +unlockedAt: DateTime
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+PetController ..> PetService
+PetService ..> GamificationService
+PetService ..> PetRepository
+GamificationService ..> AchievementRepository
+GamificationService ..> DomainEventPublisher : <<async>>
+DomainEventPublisher ..> DomainEventObserver
+GamificationObserver ..|> DomainEventObserver
+PetRepository ..> Pet
+AchievementRepository ..> Achievement
+Couple "1" o-- "1" Pet
+Couple "1" o-- "*" Achievement
+
+@enduml

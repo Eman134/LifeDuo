@@ -1,0 +1,80 @@
+@startuml
+title UC-08 - Saúde e Bem-estar
+
+top to bottom direction
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam classBorderColor #C2185B
+skinparam classBackgroundColor #FCE4EC
+skinparam classFontColor #880E4F
+skinparam packageBorderColor #AD1457
+skinparam packageBackgroundColor #FFF0F5
+skinparam packageFontColor #880E4F
+skinparam linetype ortho
+
+package "Controller" {
+  class WellnessController <<Controller>> {
+    +recordWellness(coupleId, data, consent): WellnessRecord
+    +getRealPet(coupleId): RealPet
+    +updateRealPet(coupleId, data): RealPet
+  }
+}
+
+package "Service" {
+  class WellnessService <<Service>> {
+    +recordWellness(coupleId, data, consent): WellnessRecord
+    +encryptData(data): String
+    +getRealPet(coupleId): RealPet
+    +updateRealPet(coupleId, data): RealPet
+  }
+  class NotificationService <<Service>> {
+    +sendPush(coupleId, payload): void
+  }
+}
+
+package "Repository" {
+  class WellnessRepository <<Repository>> {
+    +save(w: WellnessRecord): void
+    +get(id): WellnessRecord
+    +update(w: WellnessRecord): void
+    +remove(id): void
+  }
+  class RealPetRepository <<Repository>> {
+    +save(p: RealPet): void
+    +get(coupleId): RealPet
+    +update(p: RealPet): void
+    +remove(id): void
+  }
+}
+
+package "Model" {
+  class WellnessRecord <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +type: WellnessType
+    +dataEncrypted: String
+    +consent: Boolean
+  }
+  class RealPet <<Entity>> {
+    +id: UUID
+    +coupleId: UUID
+    +name: String
+    +species: String
+    +birthDate: Date
+  }
+  class Couple <<Entity>> {
+    +id: UUID
+  }
+}
+
+WellnessController ..> WellnessService
+WellnessService ..> WellnessRepository
+WellnessService ..> RealPetRepository
+WellnessService ..> NotificationService : <<async>>
+WellnessRepository ..> WellnessRecord
+RealPetRepository ..> RealPet
+Couple "1" o-- "*" WellnessRecord
+Couple "1" o-- "1" RealPet
+
+@enduml
