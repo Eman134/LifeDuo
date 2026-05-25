@@ -1,5 +1,5 @@
 @startuml
-title Modelo Entidade-Relacionamento Geral (E-R)
+title Modelo Entidade-Relacionamento (E-R) - LifeDuo
 
 skinparam backgroundColor #FAFAFA
 skinparam shadowing false
@@ -8,6 +8,8 @@ skinparam linetype ortho
 skinparam entityBorderColor #C2185B
 skinparam entityBackgroundColor #FCE4EC
 skinparam entityFontColor #880E4F
+
+left to right direction
 
 entity "Couple" as Couple {
   *id : UUID <<PK>>
@@ -18,6 +20,7 @@ entity "Partner" as Partner {
   *id : UUID <<PK>>
   coupleId : UUID <<FK>>
   name : String
+  email : String
 }
 
 entity "CheckIn" as CheckIn {
@@ -33,7 +36,7 @@ entity "Streak" as Streak {
   coupleId : UUID <<FK>>
   countDays : Int
   isProtected : Boolean
-  freezeExpiresAt : DateTime?
+  freezeExpiresAt : DateTime
 }
 
 entity "Pet" as Pet {
@@ -52,13 +55,20 @@ entity "Achievement" as Achievement {
   unlockedAt : DateTime
 }
 
+entity "Mission" as Mission {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  status : String
+  dueAt : DateTime
+  xpAwarded : Int
+}
+
 entity "Goal" as Goal {
   *id : UUID <<PK>>
   coupleId : UUID <<FK>>
   title : String
   targetValue : Decimal
   progress : Decimal
-  dueDate : Date
   status : String
 }
 
@@ -101,7 +111,6 @@ entity "Place" as Place {
   latitude : Decimal
   longitude : Decimal
   visited : Boolean
-  visitedAt : DateTime?
 }
 
 entity "PlaceMemory" as PlaceMemory {
@@ -112,30 +121,12 @@ entity "PlaceMemory" as PlaceMemory {
   createdAt : DateTime
 }
 
-entity "Mission" as Mission {
-  *id : UUID <<PK>>
-  coupleId : UUID <<FK>>
-  status : String
-  startAt : DateTime?
-  dueAt : DateTime
-  completedAt : DateTime?
-  xpAwarded : Int
-}
-
-entity "MissionEvidence" as MissionEvidence {
-  *id : UUID <<PK>>
-  missionId : UUID <<FK>>
-  fileUrl : String
-  status : String
-}
-
 entity "WellnessRecord" as WellnessRecord {
   *id : UUID <<PK>>
   coupleId : UUID <<FK>>
   type : String
   dataEncrypted : String
   consent : Boolean
-  createdAt : DateTime
 }
 
 entity "RealPet" as RealPet {
@@ -151,10 +142,8 @@ entity "Notification" as Notification {
   coupleId : UUID <<FK>>
   type : String
   payloadJson : JSON
-  channel : String
-  sentAt : DateTime
   isRead : Boolean
-  readAt : DateTime?
+  sentAt : DateTime
 }
 
 entity "ContentReport" as ContentReport {
@@ -163,27 +152,27 @@ entity "ContentReport" as ContentReport {
   contentId : UUID
   reason : String
   status : String
-  reviewedAt : DateTime?
+  reviewedAt : DateTime
 }
 
-Couple ||--o{ Partner
-Couple ||--o{ CheckIn
-Partner ||--o{ CheckIn
-Couple ||--|| Streak
-Couple ||--|| Pet
-Couple ||--o{ Achievement
-Couple ||--o{ Goal
-Couple ||--o{ Note
-Couple ||--o{ WishlistItem
-Couple ||--o{ Gift
-Couple ||--o{ SpecialDate
-Couple ||--o{ Place
-Place ||--o{ PlaceMemory
-Couple ||--o{ Mission
-Mission ||--o{ MissionEvidence
-Couple ||--o{ WellnessRecord
-Couple ||--|| RealPet
-Couple ||--o{ Notification
-Partner ||--o{ ContentReport
+' Couple no centro
+Couple ||--o{ Partner : "possui"
+Couple ||--o{ CheckIn : "registra"
+Partner ||--o{ CheckIn : "realiza"
+Couple ||--|| Streak : "mantém"
+Couple ||--|| Pet : "possui"
+Couple ||--o{ Achievement : "desbloqueia"
+Couple ||--o{ Mission : "cumpre"
+Couple ||--o{ Goal : "cria"
+Couple ||--o{ Note : "escreve"
+Couple ||--o{ WishlistItem : "deseja"
+Couple ||--o{ Gift : "envia"
+Couple ||--o{ SpecialDate : "celebra"
+Couple ||--o{ Place : "salva"
+Place ||--o{ PlaceMemory : "gera"
+Couple ||--o{ WellnessRecord : "registra"
+Couple ||--|| RealPet : "possui"
+Couple ||--o{ Notification : "recebe"
+Partner ||--o{ ContentReport : "reporta"
 
 @enduml
