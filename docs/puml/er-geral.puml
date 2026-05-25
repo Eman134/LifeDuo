@@ -1,0 +1,189 @@
+@startuml
+title Modelo Entidade-Relacionamento Geral (E-R)
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam ArrowColor #880E4F
+skinparam linetype ortho
+skinparam entityBorderColor #C2185B
+skinparam entityBackgroundColor #FCE4EC
+skinparam entityFontColor #880E4F
+
+entity "Couple" as Couple {
+  *id : UUID <<PK>>
+  createdAt : DateTime
+}
+
+entity "Partner" as Partner {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  name : String
+}
+
+entity "CheckIn" as CheckIn {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  partnerId : UUID <<FK>>
+  mood : String
+  createdAt : DateTime
+}
+
+entity "Streak" as Streak {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  countDays : Int
+  isProtected : Boolean
+  freezeExpiresAt : DateTime?
+}
+
+entity "Pet" as Pet {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  level : Int
+  xp : Int
+  mood : String
+  skinId : String
+}
+
+entity "Achievement" as Achievement {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  title : String
+  unlockedAt : DateTime
+}
+
+entity "Goal" as Goal {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  title : String
+  targetValue : Decimal
+  progress : Decimal
+  dueDate : Date
+  status : String
+}
+
+entity "Note" as Note {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  content : Text
+  type : String
+  isShared : Boolean
+}
+
+entity "WishlistItem" as WishlistItem {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  itemName : String
+  isPurchased : Boolean
+}
+
+entity "Gift" as Gift {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  giftType : String
+  message : String
+  status : String
+  sentAt : DateTime
+}
+
+entity "SpecialDate" as SpecialDate {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  title : String
+  date : Date
+  alertDaysBefore : Int
+}
+
+entity "Place" as Place {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  name : String
+  latitude : Decimal
+  longitude : Decimal
+  visited : Boolean
+  visitedAt : DateTime?
+}
+
+entity "PlaceMemory" as PlaceMemory {
+  *id : UUID <<PK>>
+  placeId : UUID <<FK>>
+  photoUrl : String
+  note : String
+  createdAt : DateTime
+}
+
+entity "Mission" as Mission {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  status : String
+  startAt : DateTime?
+  dueAt : DateTime
+  completedAt : DateTime?
+  xpAwarded : Int
+}
+
+entity "MissionEvidence" as MissionEvidence {
+  *id : UUID <<PK>>
+  missionId : UUID <<FK>>
+  fileUrl : String
+  status : String
+}
+
+entity "WellnessRecord" as WellnessRecord {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  type : String
+  dataEncrypted : String
+  consent : Boolean
+  createdAt : DateTime
+}
+
+entity "RealPet" as RealPet {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  name : String
+  species : String
+  birthDate : Date
+}
+
+entity "Notification" as Notification {
+  *id : UUID <<PK>>
+  coupleId : UUID <<FK>>
+  type : String
+  payloadJson : JSON
+  channel : String
+  sentAt : DateTime
+  isRead : Boolean
+  readAt : DateTime?
+}
+
+entity "ContentReport" as ContentReport {
+  *id : UUID <<PK>>
+  reporterId : UUID <<FK>>
+  contentId : UUID
+  reason : String
+  status : String
+  reviewedAt : DateTime?
+}
+
+Couple ||--o{ Partner
+Couple ||--o{ CheckIn
+Partner ||--o{ CheckIn
+Couple ||--|| Streak
+Couple ||--|| Pet
+Couple ||--o{ Achievement
+Couple ||--o{ Goal
+Couple ||--o{ Note
+Couple ||--o{ WishlistItem
+Couple ||--o{ Gift
+Couple ||--o{ SpecialDate
+Couple ||--o{ Place
+Place ||--o{ PlaceMemory
+Couple ||--o{ Mission
+Mission ||--o{ MissionEvidence
+Couple ||--o{ WellnessRecord
+Couple ||--|| RealPet
+Couple ||--o{ Notification
+Partner ||--o{ ContentReport
+
+@enduml

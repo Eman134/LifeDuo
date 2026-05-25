@@ -1,0 +1,61 @@
+@startuml
+title LifeDuo - Comunicação Geral do Sistema (Parte 1)
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+actor "Parceiro A" as A
+actor "Parceiro B" as B
+participant "App Mobile" as Mobile
+participant "API Gateway" as API
+database "PostgreSQL" as DB
+participant "Socket.IO" as WS
+participant "NotificationService" as Notif
+
+== Fluxo Principal: Check-in e Conexão Diária ==
+
+A -> Mobile : 1. abrirApp()
+Mobile -> API : 2. GET /dashboard
+API -> DB : 3. carregarMascote(), missao(), notificacoes()
+DB --> API : 4. dadosCarregados
+API --> Mobile : 5. dashboard + mascote + missao + notificacoes
+
+A -> Mobile : 6. registrarCheckin(humor)
+Mobile -> API : 7. POST /checkins
+API -> DB : 8. salvarCheckin()
+DB --> API : 9. checkinSalvo
+API -> DB : 10. atualizarStreak()
+DB --> API : 11. streakAtualizado
+API -> Notif : 12. publishEvent(CheckinRecorded)
+Notif -> WS : 13. emitRealtime()
+WS -> B : 14. notificarParceiro(humor)
+API --> Mobile : 15. 201 + streak + xpGanho
+
+== Fluxo Secundário: Mascote e Gamificação ==
+
+A -> Mobile : 16. personalizarMascote(skinId)
+Mobile -> API : 17. POST /pet/customize
+API -> DB : 18. salvarSkin()
+DB --> API : 19. skinSalva
+API --> Mobile : 20. mascoteAtualizado()
+
+A -> Mobile : 21. verConquistas()
+Mobile -> API : 22. GET /achievements
+API -> DB : 23. carregarConquistas()
+DB --> API : 24. listaConquistas
+API --> Mobile : 25. conquistas + xpTotal
+
+@enduml

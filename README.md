@@ -193,20 +193,9 @@ Para melhor visualização e entendimento da estrutura do sistema, os diagramas 
 #### Diagrama de Arquitetura
 ![Diagrama de Arquitetura](docs/diagrama-arquitetura.png)
 
-#### Diagrama de Implantação
-![Diagrama de Implantação](docs/diagrama-de-implantacao.png)
-
-#### Diagrama de Sequência — Check-in Diário
-![Diagrama de Sequência — Check-in Diário](docs/diagrama-seq-checkin-diario.png)
-
-#### Diagrama de Sequência — Gift Center
-![Diagrama de Sequência — Gift Center](docs/diagrama-seq-gift-center.png)
-
-#### Diagrama de Sequência — Meta Compartilhada
-![Diagrama de Sequência — Meta Compartilhada](docs/diagrama-seq-meta-compartilhada.png)
-
 > [!NOTE]
 > Os diagramas acima foram gerados com **PlantUML**. Os arquivos-fonte `.puml` estão disponíveis em `/docs/puml/`.
+> Para consulta de todos os diagramas do sistema, consulte em docs/LifeDuo - Documentação de Projeto.docx
 
 ---
 

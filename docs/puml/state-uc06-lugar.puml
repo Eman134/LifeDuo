@@ -1,0 +1,66 @@
+@startuml
+skinparam StateBackgroundColor #F8BBD0
+skinparam StateBorderColor #C2185B
+skinparam ArrowColor #880E4F
+skinparam StateEndColor #AD1457
+skinparam StateStartColor #C2185B
+skinparam FontName Arial
+
+title UC-06 - Lugares e Memórias\nDiagrama de Estados
+
+[*] --> Wishlist
+
+state "Wishlist" as Wishlist {
+  Wishlist : visited = false
+  Wishlist : match = false
+  Wishlist : coords = definidas
+}
+
+Wishlist --> MatchEncontrado : [match_encontrado]\nnotificarCasal()
+MatchEncontrado --> Wishlist : [parceiros_confirmam]\nregistrarMatch()
+
+Wishlist --> Visitado : [registrar_memoria]\nmarcarVisitado()
+
+state "Match Encontrado" as MatchEncontrado {
+  MatchEncontrado : match = true
+  MatchEncontrado : notificacao = enviada
+}
+
+state "Visitado" as Visitado {
+  Visitado : visited = true
+  Visitado : dataVisita = agora()
+}
+
+Visitado --> MemoriaRegistrada : [foto_salva]\nsalvarMemoria()\nconcederXP()
+
+state "Memória Registrada" as MemoriaRegistrada {
+  MemoriaRegistrada : memoriaAtiva = true
+  MemoriaRegistrada : midia = anexada
+}
+
+Wishlist --> Cancelado : [remover_lugar]\nremoverDaLista()
+Cancelado --> Arquivado : arquivarLugar()
+
+MemoriaRegistrada --> Arquivado : [pos_processamento]\natualizarMapa()
+
+state "Cancelado" as Cancelado {
+  Cancelado : statusLugar = "removido"
+  Cancelado : motivo = registrado
+}
+
+state "Arquivado" as Arquivado {
+  Arquivado : statusLugar = "arquivado"
+  Arquivado : visibilidade = somente histórico
+}
+
+Arquivado --> [*]
+
+note as LegendaLugar
+  **Transições principais:**
+  • [match_encontrado] → Match Encontrado
+  • [registrar_memoria] → Visitado
+  • [foto_salva] → Memória Registrada
+  • [remover_lugar] → Cancelado
+end note
+
+@enduml

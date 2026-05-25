@@ -1,0 +1,81 @@
+@startuml
+title LifeDuo - Comunicação Geral do Sistema (Parte 2)
+
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam sequenceArrowThickness 1.5
+skinparam sequenceParticipantBorderColor #C2185B
+skinparam sequenceParticipantBackgroundColor #F8BBD0
+skinparam sequenceActorBorderColor #C2185B
+skinparam sequenceActorBackgroundColor #F48FB1
+skinparam sequenceLifeLineBorderColor #AD1457
+skinparam sequenceArrowColor #880E4F
+skinparam sequenceMessageFontColor #880E4F
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+skinparam databaseBorderColor #C2185B
+skinparam databaseBackgroundColor #F8BBD0
+
+actor "Parceiro A" as A
+actor "Parceiro B" as B
+participant "App Mobile" as Mobile
+participant "API Gateway" as API
+database "PostgreSQL" as DB
+participant "Socket.IO" as WS
+participant "NotificationService" as Notif
+actor "Administrador" as Admin
+
+== Fluxo Secundário: Metas e Presentes ==
+
+A -> Mobile : 26. criarMetaCompartilhada(titulo, valor)
+Mobile -> API : 27. POST /goals
+API -> DB : 28. salvarMeta()
+DB --> API : 29. metaSalva
+API -> Notif : 30. sendPush(coupleId)
+Notif -> B : 31. notificarNovaMeta()
+API --> Mobile : 32. 201 + metaCriada
+
+A -> Mobile : 33. enviarPresente(giftType)
+Mobile -> API : 34. POST /gifts
+API -> DB : 35. salvarPresente()
+DB --> API : 36. presenteSalvo
+API -> Notif : 37. publishEvent(GiftSent)
+Notif -> WS : 38. emitRealtime()
+WS -> B : 39. animacaoSurpresa()
+API --> Mobile : 40. 201 + giftConfirmado
+
+== Fluxo Secundário: Lugares e Bem-estar ==
+
+A -> Mobile : 41. salvarLugar(nome, coords)
+Mobile -> API : 42. POST /places
+API -> DB : 43. salvarLugar()
+DB --> API : 44. lugarSalvo
+API -> DB : 45. verificarMatch(coupleId)
+DB --> API : 46. matchEncontrado
+API -> Notif : 47. sendPush(matchEncontrado)
+Notif -> B : 48. notificarMatch()
+API --> Mobile : 49. 201 + lugarSalvo
+
+A -> Mobile : 50. registrarSaude(dados, consent)
+Mobile -> API : 51. POST /wellness
+API -> DB : 52. encryptData(), salvarRegistro()
+DB --> API : 53. registroSalvo
+API -> Notif : 54. sendPush(coupleId)
+Notif -> B : 55. notificacaoSutil()
+API --> Mobile : 56. 201 + registroConfirmado
+
+== Fluxo Administrativo ==
+
+Admin -> API : 57. GET /moderation/reports
+API -> DB : 58. listarReports()
+DB --> API : 59. listaReports
+API --> Admin : 60. relatorioExibido
+
+Admin -> API : 61. POST /moderation/approve(reportId)
+API -> DB : 62. atualizarStatus(aprovado)
+DB --> API : 63. statusAtualizado
+API -> Notif : 64. sendPush(criador)
+API --> Admin : 65. aprovacaoConfirmada
+
+@enduml

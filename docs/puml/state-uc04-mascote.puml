@@ -1,0 +1,99 @@
+@startuml
+skinparam backgroundColor #FAFAFA
+skinparam shadowing false
+skinparam StateBackgroundColor #F8BBD0
+skinparam StateBorderColor #C2185B
+skinparam ArrowColor #880E4F
+skinparam StateEndColor #AD1457
+skinparam StateStartColor #C2185B
+skinparam noteBorderColor #AD1457
+skinparam noteBackgroundColor #FCE4EC
+skinparam noteFontColor #880E4F
+
+title UC-04 - Mascote Virtual - Diagrama de Estados
+
+[*] --> Neutro
+
+state "Neutro" as Neutro {
+  Neutro : humor = "neutro"
+  Neutro : xpMultiplier = 1.0
+  Neutro : animacao = "padrão"
+}
+
+Neutro --> Feliz : [both_checkin]
+Neutro --> Customizando : [abrir_customizacao]
+Neutro --> Doente : [registrar_saude and severidade >= 3]
+Neutro --> RecebePresente : [presente_recebido]
+
+state "Feliz" as Feliz {
+  Feliz : humor = "feliz"
+  Feliz : xpMultiplier = 1.2
+  Feliz : animacao = "contente"
+}
+
+Feliz --> Empolgado : [meta_concluida or presente_recebido]
+Feliz --> Triste : [inatividade > 48h]
+
+state "Empolgado" as Empolgado {
+  Empolgado : humor = "empolgado"
+  Empolgado : xpMultiplier = 1.5
+  Empolgado : animacao = "celebração"
+}
+
+Empolgado --> Feliz : [tempo_passado >= 24h]
+
+state "Triste" as Triste {
+  Triste : humor = "triste"
+  Triste : xpMultiplier = 0.5
+  Triste : animacao = "alerta"
+}
+
+Triste --> Neutro : [novo_checkin]
+Triste --> Congelado : [usar_streak_freeze]
+
+state "Congelado" as Congelado {
+  Congelado : streakProtegido = true
+  Congelado : dataExpiracao = setada
+}
+
+Congelado --> Neutro : [freeze_expira]
+
+state "Customizando" as Customizando {
+  Customizando : emCustomizacao = true
+  Customizando : skinSelecionada = setada
+}
+
+Customizando --> Neutro : [salvar_customizacao]
+
+state "Doente" as Doente {
+  Doente : humor = "doente"
+  Doente : xpMultiplier = 0.0
+  Doente : restricoes = ativas
+}
+
+Doente --> Neutro : [melhora]
+
+state "RecebePresente" as RecebePresente {
+  RecebePresente : emAnimacao = true
+  RecebePresente : presenteAtual = definido
+}
+
+RecebePresente --> Feliz : [animacao_concluida]
+
+note right of Empolgado
+  Gatilhos: meta concluída,
+  presente recebido ou
+  marco comemorativo.
+end note
+
+note right of Triste
+  XP reduzido pela metade.
+  Animações de alerta ativas.
+end note
+
+note left of Congelado
+  Freeze protege o streak
+  durante o período de vigência.
+end note
+
+@enduml

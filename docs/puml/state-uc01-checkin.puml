@@ -1,0 +1,62 @@
+@startuml
+skinparam StateBackgroundColor #F8BBD0
+skinparam StateBorderColor #C2185B
+skinparam ArrowColor #880E4F
+skinparam StateEndColor #AD1457
+skinparam StateStartColor #C2185B
+skinparam FontName Arial
+
+title UC-01 - Check-in Diário\nDiagrama de Estados
+
+[*] --> DiaAberto
+
+state "Dia Aberto" as DiaAberto {
+  DiaAberto : data = hoje
+  DiaAberto : checkins = 0
+  DiaAberto : prazo = 24h
+}
+
+DiaAberto --> UmCheckin : [parceiro_checkin]\nregistrarCheckin()\npublicarEvento()
+DiaAberto --> Expirado : [prazo_atingido]\nmarcarFalta()\nnotificarCasal()
+
+state "1 Check-in" as UmCheckin {
+  UmCheckin : checkins = 1
+  UmCheckin : parceiroRestante = pendente
+  UmCheckin : lembreteAtivo = true
+}
+
+UmCheckin --> AmbosCheckin : [outro_parceiro_checkin]\natualizarStreak()\nconcederXP()
+UmCheckin --> Expirado : [prazo_atingido]\nresetarStreak()\nregistrarQuebra()
+
+state "Ambos Check-in" as AmbosCheckin {
+  AmbosCheckin : checkins = 2
+  AmbosCheckin : streakAtualizada = true
+  AmbosCheckin : xpConcedido = true
+}
+
+AmbosCheckin --> Arquivado : [dia_encerrado]\nfecharDia()\nresumirAtividades()
+
+state "Expirado" as Expirado {
+  Expirado : statusDia = "expirado"
+  Expirado : checkinsPendentes = true
+  Expirado : streakAtualizada = false
+}
+
+Expirado --> Arquivado : arquivarDia()
+
+state "Arquivado" as Arquivado {
+  Arquivado : statusDia = "arquivado"
+  Arquivado : auditoria = registrada
+}
+
+Arquivado --> [*]
+
+note as LegendaCheckin
+  **Transições principais:**
+  • [parceiro_checkin] → 1 Check-in
+  • [outro_parceiro_checkin] → Ambos Check-in
+  • [prazo_atingido] → Expirado
+  • [dia_encerrado] → Arquivado
+end note
+
+@enduml
