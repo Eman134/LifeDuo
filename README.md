@@ -185,13 +185,13 @@ O LifeDuo adota **Clean Architecture** combinada com princípios de **DDD (Domai
 Para melhor visualização e entendimento da estrutura do sistema, os diagramas principais estão organizados abaixo.
 
 #### Diagrama de Atores
-![Diagrama de Atores](docs/diagrama-atores.png)
+![Diagrama de Atores](docs/diagramas-imagens/diagrama-atores.png)
 
 #### Diagrama de Casos de Uso
-![Diagrama de Casos de Uso](docs/diagrama-casos-de-uso.png)
+![Diagrama de Casos de Uso](docs/diagramas-imagens/diagrama-casos-de-uso.png)
 
 #### Diagrama de Arquitetura
-![Diagrama de Arquitetura](docs/diagrama-arquitetura.png)
+![Diagrama de Arquitetura](docs/diagramas-imagens/diagrama-arquitetura.png)
 
 > [!NOTE]
 > Os diagramas acima foram gerados com **PlantUML**. Os arquivos-fonte `.puml` estão disponíveis em `/docs/puml/`.
